@@ -1,0 +1,7 @@
+name: Camera
+version: '${project.version}'
+main: com.nido.camera.Camera
+api-version: 1.19
+commands:
+  cam:
+    description: "Sets a camera to a player position"
