@@ -19,4 +19,10 @@ public class Cam {
 
     }
 
+    public Location getLocation(){
+
+        return camlocation;
+
+    }
+
 }
