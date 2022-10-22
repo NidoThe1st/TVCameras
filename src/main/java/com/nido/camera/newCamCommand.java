@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @CommandAlias("camera|cam")
 public class newCamCommand extends BaseCommand {
 
-    static Camera plugin;
+    static Camera plugin = Camera.getInstance();
     @HelpCommand
     public static void onHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Cameras 1.0 help");
@@ -32,7 +32,7 @@ public class newCamCommand extends BaseCommand {
             remove = getParsedRemoveFlag(index);
             //checks if index is a valid number
             if (getParsedIndex(index) == null) {
-                player.sendMessage("messages.error.numberException");
+                player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "This is not a valid number!");
                 return;
             }
             regionIndex = getParsedIndex(index);
@@ -41,13 +41,13 @@ public class newCamCommand extends BaseCommand {
         }
         if (remove) {
             if (plugin.removeCamera(regionIndex, Utils.getClosestTrack(player))) {
-                player.sendMessage("messages.remove.region");
+                player.sendMessage("Camera " + regionIndex + " was removed from track " + Utils.getClosestTrack(player));
             } else {
-                player.sendMessage("messages.error.remove.region");
+                player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "There was an error removing the camera!");
             }
         } else {
             plugin.saveNewCamera(new Cam(player.getLocation(), Utils.getClosestTrack(player), regionIndex));
-            player.sendMessage("messages.create.region");
+            player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + Utils.getClosestTrack(player).getDisplayName());
         }
     }
     @CommandPermission("cameras.follow")
@@ -57,7 +57,7 @@ public class newCamCommand extends BaseCommand {
         ArrayList<Player> followers = new ArrayList<>();
         followers.add(follower);
         plugin.addFollowed(followed.getPlayer(), followers);
-        follower.sendMessage(ChatColor.AQUA + "You're now following " + followed.getPlayer().name());
+        follower.sendMessage(ChatColor.AQUA + "You're now following " + followed.getPlayer().getName());
     }
     @CommandPermission("cameras.stopfollow")
     @Subcommand("stopfollow|sf")
@@ -86,7 +86,7 @@ public class newCamCommand extends BaseCommand {
         }
     }
     @CommandPermission("cameras.view")
-    @Subcommand("view/v")
+    @Subcommand("view|v")
     @CommandCompletion("<index>")
     public static void onViewCamera(Player player, int index){
         //checks if the index and the track actually exist
