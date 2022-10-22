@@ -1,7 +1,9 @@
 name: Camera
+authors: [NidoThe1st, BoatHub]
 version: '${project.version}'
 main: com.nido.camera.Camera
 api-version: 1.19
 commands:
   cam:
-    description: "Sets a camera to a player position"
+    description: "Base command for cameras"
+    aliases: []

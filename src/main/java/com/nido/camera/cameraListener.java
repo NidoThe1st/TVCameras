@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ public class cameraListener implements Listener {
                 Location followedLocation = p.getLocation();
                 Cam closest = null;
                 //checking for a camera closest to the followed player
-                for (Cam camera: plugin.getCameras().values()) {
+                for (Cam camera: plugin.getCameras()) {
                     if(closest != null) {
                         if(closest.getLocation().distance(followedLocation) > camera.getLocation().distance(followedLocation)) {
                             closest =  camera;
@@ -38,7 +39,6 @@ public class cameraListener implements Listener {
                     if(plugin.haveCamera(follower) && plugin.getCurrentCamera(follower).equals(closest)) {}
                     else{
                         closest.tpPlayer(follower);
-                        follower.lookAt(p, LookAnchor.EYES, LookAnchor.EYES);
                         plugin.setCurrentCamera(follower, closest);
                     }
                 }
@@ -47,4 +47,11 @@ public class cameraListener implements Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e){
+
+        Player p = e.getPlayer();
+        plugin.onQuit(p);
+
+    }
 }
