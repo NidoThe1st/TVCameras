@@ -2,10 +2,8 @@ package com.nido.camera;
 
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.idb.*;
-import me.makkuusen.timing.system.ApiUtilities;
 import me.makkuusen.timing.system.track.Track;
-import me.makkuusen.timing.system.track.TrackDatabase;
-import org.bukkit.Location;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,11 +11,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public final class Camera extends JavaPlugin {
     public FileConfiguration config = getConfig();
-    HashMap<Player, Cam> currentCamera = new HashMap<>();
-    HashMap<Player, ArrayList<Player>> followedPlayers = new HashMap<>();
+    HashMap<Player, CamPlayer> cameraPlayers = new HashMap<>();
     ArrayList<Cam> cameras = new ArrayList<>();
     //add a new camera with the name (addedcamera)
     public void addCamera(Cam camera){
@@ -37,64 +35,25 @@ public final class Camera extends JavaPlugin {
         return null;
 
     }
-
-    public boolean haveCamera(Player key){
-
-        return currentCamera.containsKey(key);
-    }
-    public void setCurrentCamera(Player p, Cam cam) {
-        currentCamera.put(p, cam);
-    }
-    public Cam getCurrentCamera(Player p) {
-        return currentCamera.get(p);
-    }
     //get all cameras
     public ArrayList<Cam> getCameras() {
         return cameras;
     }
-    //Add followers to a player (followed)
-    public void addFollowed(Player followed, ArrayList<Player> followers){
-        //check if there are followers for the player (followed)
-        if(followedPlayers.containsKey(followed)) {
-            //add new followers and old followers together
-            followers.addAll(followedPlayers.get(followed));
-        }
-        //update the list with the combined followers/new followers
-        followedPlayers.put(followed,followers);
-
-    }
-    public void removeFollower(Player followed, Player follower) {
-        // get current followers
-        ArrayList<Player> followers = followedPlayers.get(followed);
-        //remove follower if exists
-        followers.remove(follower);
-        //if no followers left remove it from the hashmap
-        if(followers.isEmpty()) {followedPlayers.remove(followed);}
-        //sets the new list of followers
-        else { followedPlayers.put(followed, followers);}
-
-    }
-    //find who is the player (follower) following
-    public Player whoFollowed(Player follower) {
-        for(Player followed : followedPlayers.keySet()) {
-            if(getFollowers(followed).contains(follower)) {
-                return followed;
+    public void getTrackCameras(Player p){
+        List<Integer> trackcameras = new ArrayList<>();
+        for (Cam camera: cameras){
+            if (camera.getTrack() == Utils.getClosestTrack(p)) {
+                Integer camIndex = camera.getIndex();
+                trackcameras.add(camIndex);
             }
+            StringBuilder tracks = new StringBuilder("This track has cameras with index ");
+            for (int index: trackcameras) {
+                tracks.append(index).append(" ");
+            }
+            tracks.deleteCharAt(tracks.length() - 1);
+            p.sendMessage(ChatColor.AQUA + tracks.toString());
         }
-        return null;
     }
-    //get the list of followers who are following a player (followed)
-    public ArrayList<Player> getFollowers(Player followed){
-
-        return followedPlayers.get(followed);
-
-    }
-    //check if a player is being followed
-    public boolean isFollowed(Player followed){
-
-        return followedPlayers.containsKey(followed);
-    }
-
     private static Camera instance;
 
     public static Camera getInstance() {
@@ -103,36 +62,29 @@ public final class Camera extends JavaPlugin {
 
     public void onQuit(Player player){
         //removes player from hashmaps
-        currentCamera.remove(player);
-        Player followed = whoFollowed(player);
-        if(followed != null){
-            removeFollower(followed, player);
+        CamPlayer camPlayer = getPlayer(player);
+        camPlayer.stopFollowing();
+        ArrayList<Player> followers = camPlayer.getFollowers();
+        for (Player follower: followers) {
+            getPlayer(follower).stopFollowing();
         }
-        followedPlayers.remove(player);
+        cameraPlayers.remove(player);
     }
     private void loadCameras() throws SQLException {
         //gets the data for the cameras from the dat//abase
-        var locations = DB.getResults("SELECT * FROM `ts_locations` WHERE `type` = 'CAMERA'");
+        var locations = DB.getResults("SELECT * FROM `Cameras`;");
         //going through every result in the database
         for (DbRow dbRow : locations) {
-            //checking if a track with the given id exists
-            var maybeTrack = TrackDatabase.getTrackById(dbRow.get("trackId"));
-            if(maybeTrack.isPresent()) {
-                //if exists make a new camera object with data from the database row
-                Track track = maybeTrack.get();
-                Location loc = ApiUtilities.stringToLocation(dbRow.getString("location"));
-                int index = dbRow.getInt("index");
-                if(loc != null) {
-                    Cam camera = new Cam(loc, track, index);
-                    addCamera(camera);
-                }
-            }
+            Cam camera = new Cam(dbRow);
+            addCamera(camera);
         }
+
+
     }
     public void saveNewCamera(Cam camera) {
         if(getCamera(camera.getTrack(), camera.getIndex()) == null) {
             try {
-                DB.executeInsert("INSERT INTO `ts_locations` (`trackId`, `index`, `type`, `location`) VALUES(" + camera.getTrack().getId() + ", " + camera.getIndex() + ", 'CAMERA', '" + ApiUtilities.locationToString(camera.getLocation()) + "');");
+                DB.executeInsert("INSERT INTO `Cameras` (`LABEL`, `REGION`, `INDEX`, `TRACKID`, `CAMPOSITION`) VALUES(" + camera.getLabel() + ", " + camera.getMinMax() + ", " + camera.getIndex() + ", " + camera.getTrack().getId() + ", " + Utils.locationToString(camera.getLocation()) + "');");
                 addCamera(camera);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -140,7 +92,7 @@ public final class Camera extends JavaPlugin {
         }
         //if camera already exists
         else {
-            DB.executeUpdateAsync("UPDATE `ts_locations` SET `location` = '" + ApiUtilities.locationToString(camera.getLocation()) + "' WHERE `trackId` = " + camera.getTrack().getId() + " AND `index` = " + camera.getIndex() + " AND `type` = 'CAMERA';");
+            DB.executeUpdateAsync("UPDATE `Cameras` SET `CAMPOSITION` = '" + Utils.locationToString(camera.getLocation()) + "', `REGION` = '" + camera.getMinMax() + "', `LABEL` = '" + camera.getLabel() + "' WHERE `TRACKID` = " + camera.getTrack().getId() + " AND `INDEX` = " + camera.getIndex() + ";");
             addCamera(camera);
         }
     }
@@ -177,6 +129,17 @@ public final class Camera extends JavaPlugin {
         manager.registerCommand(new newCamCommand());
         //load data from db
         try {
+            try {
+                DB.executeUpdate("CREATE TABLE IF NOT EXISTS Cameras " +
+                        "(ID MEDIUMINT NOT NULL UNIQUE AUTO_INCREMENT," +
+                        " LABEL VARCHAR(100)," +
+                        " REGION VARCHAR(100) NOT NULL," +
+                        " TRACKID MEDIUMINT NOT NULL," +
+                        " CAMPOSITION VARCHAR(255) NOT NULL," +
+                        " INDEX MEDIUMINT NOT NULL);");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             loadCameras();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -193,9 +156,19 @@ public final class Camera extends JavaPlugin {
         if (getCamera(track, regionIndex) != null) {
             Cam camera = getCamera(track, regionIndex);
             cameras.remove(camera);
-            DB.executeUpdateAsync("DELETE FROM `ts_locations` WHERE `trackId` = " + camera.getTrack().getId() + " AND `index` = " + camera.getIndex() + " AND `type` = 'CAMERA';");
+            assert camera != null;
+            DB.executeUpdateAsync("DELETE FROM `Cameras` WHERE `TRACKID` = " + camera.getTrack().getId() + " AND `INDEX` = " + camera.getIndex() + ";");
             return true;
         }
         return false;
     }
+    public CamPlayer getPlayer(Player p) {
+        return cameraPlayers.get(p);
+    }
+    public void newCamPlayer(Player p) {
+        if(!cameraPlayers.containsKey(p)) {
+            cameraPlayers.put(p, new CamPlayer(p));
+        }
+    }
+
 }
