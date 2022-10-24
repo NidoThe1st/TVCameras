@@ -10,12 +10,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 public class cameraListener implements Listener {
@@ -96,6 +98,38 @@ public class cameraListener implements Listener {
         CamPlayer player = plugin.getPlayer(e.getPlayer());
         if(player.isEditing() && Objects.requireNonNull(e.getPlayer().getInventory().getItem(EquipmentSlot.HAND)).getType() == Material.STICK){
             e.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void onClick(InventoryClickEvent e){
+        Player p = (Player) e.getWhoClicked();
+        CamPlayer camPlayer = plugin.getPlayer(p);
+        HashMap<Integer, Cam> cameraItems = camPlayer.getCameraItems();
+        if (camPlayer.isInv()){
+            e.setCancelled(true);
+            if (cameraItems.containsKey(e.getSlot())) {
+                Cam camera = cameraItems.get(e.getSlot());
+                camera.tpPlayer(p);
+                e.getInventory().close();
+            }
+        }
+    }
+    @EventHandler
+    public void onDrag(InventoryDragEvent e){
+        Player p = (Player) e.getWhoClicked();
+        CamPlayer camPlayer = plugin.getPlayer(p);
+        if (camPlayer.isInv() == true){
+            e.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void onClose(InventoryCloseEvent e){
+        Player p = (Player) e.getPlayer();
+        CamPlayer camPlayer = plugin.getPlayer(p);
+        if(e.getInventory().getType() == InventoryType.CHEST) {
+            if (camPlayer.isInv() == true) {
+                camPlayer.setInv(false);
+            }
         }
     }
 }

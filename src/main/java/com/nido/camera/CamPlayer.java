@@ -6,16 +6,20 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CamPlayer {
-    Track editing;
-    Camera plugin = Camera.getInstance();
-    Player p;
-    CamPlayer following;
-    Location selection1;
-    Location selection2;
-    Cam currentCamera;
-    ArrayList<Player> followers = new ArrayList<>();
+    private Track editing;
+    private Camera plugin = Camera.getInstance();
+    private Player p;
+    private CamPlayer following;
+    private Location selection1;
+    private Location selection2;
+    private Cam currentCamera;
+    private ArrayList<Player> followers = new ArrayList<>();
+    private HashMap<Integer, Cam> cameraItems = new HashMap<>();
+    private boolean inv = false;
+
     public CamPlayer(Player p) {
         this.p = p;
     }
@@ -75,6 +79,21 @@ public class CamPlayer {
     }
     public Track getEditing() {
         return editing;
+    }
+    public boolean isInv() {
+        return inv;
+    }
+
+    public void setInv(boolean invetory) {
+        this.inv = invetory;
+        if(!invetory) {cameraItems.clear();}
+    }
+    public void setCameraItems(HashMap<Integer, Cam> camItems) {
+        this.cameraItems = camItems;
+    }
+
+    public HashMap<Integer, Cam> getCameraItems(){
+        return cameraItems;
     }
 
 }
