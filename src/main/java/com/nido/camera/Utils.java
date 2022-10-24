@@ -16,13 +16,15 @@ public abstract class Utils {
         Location playerLoc = p.getLocation();
         Track closest = null;
         for (Track track: tracks) {
-            if(track.getSpawnLocation().getWorld().equals(playerLoc.getWorld())) {
-                if (closest != null) {
-                    if (closest.getSpawnLocation().distance(playerLoc) > track.getSpawnLocation().distance(playerLoc)) {
+            if(track.getSpawnLocation().getWorld() != null) {
+                if(track.getSpawnLocation().getWorld().equals(playerLoc.getWorld())) {
+                    if (closest != null) {
+                        if (closest.getSpawnLocation().distance(playerLoc) > track.getSpawnLocation().distance(playerLoc)) {
+                            closest = track;
+                        }
+                    } else {
                         closest = track;
                     }
-                } else {
-                    closest = track;
                 }
             }
         }

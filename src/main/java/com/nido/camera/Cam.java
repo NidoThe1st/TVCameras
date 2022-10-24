@@ -28,7 +28,7 @@ public class Cam {
     public Cam(DbRow dbRow) {
 
         this.camlocation = Utils.stringToLocation(dbRow.get("CAMPOSITION"));
-        this.camTrack = TrackDatabase.getTrack(String.valueOf(dbRow.getInt("TRACKID"))).get();
+        this.camTrack = TrackDatabase.getTrackById(dbRow.getInt("TRACKID")).get();
         this.index = dbRow.getInt("INDEX");
         this.label = dbRow.getString("LABEL");
         String MinMax = dbRow.getString("REGION");

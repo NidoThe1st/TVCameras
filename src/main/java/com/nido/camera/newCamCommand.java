@@ -16,8 +16,8 @@ public class newCamCommand extends BaseCommand {
         sender.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Cameras 1.0 help");
         sender.sendMessage(ChatColor.AQUA + "/camera edit");
         sender.sendMessage(ChatColor.DARK_AQUA + "- Enter edit mode for the track you are currently on");
-        sender.sendMessage(ChatColor.AQUA + "/camera set (index)");
-        sender.sendMessage(ChatColor.DARK_AQUA + "- Places a camera on your current position and orients it where you are looking");
+        sender.sendMessage(ChatColor.AQUA + "/camera set [index]");
+        sender.sendMessage(ChatColor.DARK_AQUA + "- Places a camera on your current position and orients it where you are looking. Before that you need to make a cuboid region by taking a stick and selecting one corner with left click and the other with right");
         sender.sendMessage(ChatColor.AQUA + "/camera view <index>");
         sender.sendMessage(ChatColor.DARK_AQUA + "- Teleports you to the camera you specified");
         sender.sendMessage(ChatColor.AQUA + "/camera follow <Player>");
@@ -39,7 +39,7 @@ public class newCamCommand extends BaseCommand {
     }
     @CommandPermission("cameras.set")
     @Subcommand("set|s")
-    @CommandCompletion("<index>")
+    @CommandCompletion("<index>, [label]")
     public static void onCameraSet(Player player,  @Optional String index, @Optional String label) {
         CamPlayer camPlayer = plugin.getPlayer(player);
         if(camPlayer.isEditing()) {
@@ -58,15 +58,15 @@ public class newCamCommand extends BaseCommand {
                 regionIndex = plugin.getCameras().size() + 1;
             }
             if (remove) {
-                if (plugin.removeCamera(regionIndex, Utils.getClosestTrack(player))) {
-                    player.sendMessage("Camera " + regionIndex + " was removed from track " + Utils.getClosestTrack(player));
+                if (plugin.removeCamera(regionIndex, camPlayer.getEditing())) {
+                    player.sendMessage(ChatColor.DARK_AQUA + "Camera " + regionIndex + " was removed from track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "There was an error removing the camera!");
                 }
             } else {
                 if(camPlayer.getSelection1() != null && camPlayer.getSelection2() != null && camPlayer.getSelection1().getWorld() == camPlayer.getSelection2().getWorld()) {
-                    plugin.saveNewCamera(new Cam(player.getLocation(), Utils.getClosestTrack(player), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
-                    player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + Utils.getClosestTrack(player).getDisplayName());
+                    plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
+                    player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
                 }

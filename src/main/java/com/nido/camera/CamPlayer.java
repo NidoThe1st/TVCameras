@@ -15,32 +15,32 @@ public class CamPlayer {
     Location selection1;
     Location selection2;
     Cam currentCamera;
-    ArrayList<Player> followers;
+    ArrayList<Player> followers = new ArrayList<>();
     public CamPlayer(Player p) {
         this.p = p;
     }
     public ArrayList<Player> getFollowers() {
         return followers;
     }
-    public void addFollower(Player p) {
-        if(!followers.contains(p)) {
-            followers.add(p);
-            CamPlayer follower = plugin.getPlayer(p);
-            follower.startFollowing(this.p);
+    public void addFollower(Player follower) {
+        if(!followers.contains(follower)) {
+            followers.add(follower);
+            CamPlayer camfollower = plugin.getPlayer(follower);
+            camfollower.startFollowing(p);
         }
     }
     public void removeFollower(Player p) {
         followers.remove(p);
     }
-    public void startFollowing(Player p) {
+    public void startFollowing(Player followed) {
         if(following != null) {stopFollowing();}
-        CamPlayer followed = plugin.getPlayer(p);
-        followed.addFollower(p);
-        following = followed;
+        CamPlayer camFollowed = plugin.getPlayer(followed);
+        camFollowed.addFollower(p);
+        following = camFollowed;
     }
     public void stopFollowing() {
         if(following != null) {
-            following.removeFollower(p);
+            following.removeFollower(this.p);
             following = null;
         }
     }
@@ -72,6 +72,9 @@ public class CamPlayer {
                 camPlayer.setCurrentCamera(camera);
             }
         }
+    }
+    public Track getEditing() {
+        return editing;
     }
 
 }

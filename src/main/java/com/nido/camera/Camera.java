@@ -40,19 +40,20 @@ public final class Camera extends JavaPlugin {
         return cameras;
     }
     public void getTrackCameras(Player p){
-        List<Integer> trackcameras = new ArrayList<>();
+        ArrayList<Integer> trackcameras = new ArrayList<>();
+        StringBuilder tracks = new StringBuilder("This track has cameras with index ");
         for (Cam camera: cameras){
             if (camera.getTrack() == Utils.getClosestTrack(p)) {
                 Integer camIndex = camera.getIndex();
                 trackcameras.add(camIndex);
             }
-            StringBuilder tracks = new StringBuilder("This track has cameras with index ");
+
             for (int index: trackcameras) {
                 tracks.append(index).append(" ");
             }
             tracks.deleteCharAt(tracks.length() - 1);
-            p.sendMessage(ChatColor.AQUA + tracks.toString());
         }
+        p.sendMessage(ChatColor.AQUA + tracks.toString());
     }
     private static Camera instance;
 
@@ -64,9 +65,12 @@ public final class Camera extends JavaPlugin {
         //removes player from hashmaps
         CamPlayer camPlayer = getPlayer(player);
         camPlayer.stopFollowing();
-        ArrayList<Player> followers = camPlayer.getFollowers();
-        for (Player follower: followers) {
-            getPlayer(follower).stopFollowing();
+        ArrayList<Player> followers = new ArrayList<>();
+        followers.addAll(camPlayer.getFollowers());
+        if(!followers.isEmpty()) {
+            for (Player follower : followers) {
+                getPlayer(follower).stopFollowing();
+            }
         }
         cameraPlayers.remove(player);
     }
@@ -84,7 +88,7 @@ public final class Camera extends JavaPlugin {
     public void saveNewCamera(Cam camera) {
         if(getCamera(camera.getTrack(), camera.getIndex()) == null) {
             try {
-                DB.executeInsert("INSERT INTO `Cameras` (`LABEL`, `REGION`, `INDEX`, `TRACKID`, `CAMPOSITION`) VALUES(" + camera.getLabel() + ", " + camera.getMinMax() + ", " + camera.getIndex() + ", " + camera.getTrack().getId() + ", " + Utils.locationToString(camera.getLocation()) + "');");
+                DB.executeInsert("INSERT INTO `Cameras` (`LABEL`, `REGION`, `INDEX`, `TRACKID`, `CAMPOSITION`) VALUES('" + camera.getLabel() + "', '" + camera.getMinMax() + "', '" + camera.getIndex() + "', '" + camera.getTrack().getId() + "', '" + Utils.locationToString(camera.getLocation()) + "');");
                 addCamera(camera);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -92,7 +96,7 @@ public final class Camera extends JavaPlugin {
         }
         //if camera already exists
         else {
-            DB.executeUpdateAsync("UPDATE `Cameras` SET `CAMPOSITION` = '" + Utils.locationToString(camera.getLocation()) + "', `REGION` = '" + camera.getMinMax() + "', `LABEL` = '" + camera.getLabel() + "' WHERE `TRACKID` = " + camera.getTrack().getId() + " AND `INDEX` = " + camera.getIndex() + ";");
+            DB.executeUpdateAsync("UPDATE `Cameras` SET `CAMPOSITION` = '" + Utils.locationToString(camera.getLocation()) + "', `REGION` = '" + camera.getMinMax() + "', `LABEL` = '" + camera.getLabel() + "' WHERE `TRACKID` = '" + camera.getTrack().getId() + "' AND `INDEX` = '" + camera.getIndex() + "';");
             addCamera(camera);
         }
     }
@@ -130,13 +134,16 @@ public final class Camera extends JavaPlugin {
         //load data from db
         try {
             try {
-                DB.executeUpdate("CREATE TABLE IF NOT EXISTS Cameras " +
-                        "(ID MEDIUMINT NOT NULL UNIQUE AUTO_INCREMENT," +
-                        " LABEL VARCHAR(100)," +
-                        " REGION VARCHAR(100) NOT NULL," +
-                        " TRACKID MEDIUMINT NOT NULL," +
-                        " CAMPOSITION VARCHAR(255) NOT NULL," +
-                        " INDEX MEDIUMINT NOT NULL);");
+                DB.executeUpdate("""
+                        CREATE TABLE IF NOT EXISTS `Cameras` (
+                          `ID` int(11) NOT NULL AUTO_INCREMENT,
+                          `TRACKID` int(11) NOT NULL,
+                          `INDEX` int(11) NOT NULL,
+                          `REGION` varchar(255) NOT NULL,
+                          `CAMPOSITION` varchar(255) NOT NULL,
+                          `LABEL` varchar(255) DEFAULT NULL,
+                          PRIMARY KEY (`id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;""");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
