@@ -9,12 +9,12 @@ import org.bukkit.util.Vector;
 
 public class Cam {
 
-    Vector minp;
-    Vector maxp;
-    Location camlocation;
-    Track camTrack;
-    String label;
-    int index;
+    private Vector minp;
+    private Vector maxp;
+    private Location camlocation;
+    private Track camTrack;
+    private String label;
+    private int index;
 
     public Cam(Location camloc, Track camTrack, int index, Vector min, Vector max, String label) {
 
@@ -30,7 +30,8 @@ public class Cam {
         this.camlocation = Utils.stringToLocation(dbRow.get("CAMPOSITION"));
         this.camTrack = TrackDatabase.getTrackById(dbRow.getInt("TRACKID")).get();
         this.index = dbRow.getInt("INDEX");
-        this.label = dbRow.getString("LABEL");
+        if(dbRow.getString("LABEL").contentEquals("null")) {this.label = null;}
+        else {this.label = dbRow.getString("LABEL");}
         String MinMax = dbRow.getString("REGION");
         String[] MinAndMax = MinMax.split(":");
         this.minp = Utils.stringToVector(MinAndMax[0]);
