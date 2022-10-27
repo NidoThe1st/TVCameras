@@ -11,7 +11,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public final class Camera extends JavaPlugin {
     public FileConfiguration config = getConfig();
@@ -33,8 +32,8 @@ public final class Camera extends JavaPlugin {
             if(camera.getIndex() == index && camera.getTrack() == track) {return camera;}
         }
         return null;
-
     }
+
     //get all cameras
     public ArrayList<Cam> getCameras() {
         return cameras;
@@ -65,13 +64,13 @@ public final class Camera extends JavaPlugin {
         //removes player from hashmaps
         CamPlayer camPlayer = getPlayer(player);
         camPlayer.stopFollowing();
-        ArrayList<Player> followers = new ArrayList<>();
-        followers.addAll(camPlayer.getFollowers());
+        ArrayList<Player> followers = new ArrayList<>(camPlayer.getFollowers());
         if(!followers.isEmpty()) {
             for (Player follower : followers) {
                 getPlayer(follower).stopFollowing();
             }
         }
+        DB.executeUpdateAsync("UPDATE `Camera_Players` set `DISABLED` = ? WHERE `UUID` = ?;", Utils.disabledToString(camPlayer.getDisabledCameras()), player.getUniqueId());
         cameraPlayers.remove(player);
     }
     private void loadCameras() throws SQLException {
@@ -85,19 +84,20 @@ public final class Camera extends JavaPlugin {
 
 
     }
-    public void saveNewCamera(Cam camera) {
-        if(getCamera(camera.getTrack(), camera.getIndex()) == null) {
+    public void saveNewCamera(Cam tempcamera) {
+        if(getCamera(tempcamera.getTrack(), tempcamera.getIndex()) == null) {
             try {
-                DB.executeInsert("INSERT INTO `Cameras` (`LABEL`, `REGION`, `INDEX`, `TRACKID`, `CAMPOSITION`) VALUES('" + camera.getLabel() + "', '" + camera.getMinMax() + "', '" + camera.getIndex() + "', '" + camera.getTrack().getId() + "', '" + Utils.locationToString(camera.getLocation()) + "');");
-                addCamera(camera);
+                DB.executeInsert("INSERT INTO `Cameras` (`LABEL`, `REGION`, `INDEX`, `TRACKID`, `CAMPOSITION`) VALUES('" + tempcamera.getLabel() + "', '" + tempcamera.getMinMax() + "', '" + tempcamera.getIndex() + "', '" + tempcamera.getTrack().getId() + "', '" + Utils.locationToString(tempcamera.getLocation()) + "');");
+                var camerarow = DB.getFirstRow("SELECT * FROM `Cameras` WHERE `TRACKID` = '" + tempcamera.getTrack().getId() + "' AND `INDEX` = '" + tempcamera.getIndex() + "';");
+                addCamera(new Cam(camerarow));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         //if camera already exists
         else {
-            DB.executeUpdateAsync("UPDATE `Cameras` SET `CAMPOSITION` = '" + Utils.locationToString(camera.getLocation()) + "', `REGION` = '" + camera.getMinMax() + "', `LABEL` = '" + camera.getLabel() + "' WHERE `TRACKID` = '" + camera.getTrack().getId() + "' AND `INDEX` = '" + camera.getIndex() + "';");
-            addCamera(camera);
+            DB.executeUpdateAsync("UPDATE `Cameras` SET `CAMPOSITION` = '" + Utils.locationToString(tempcamera.getLocation()) + "', `REGION` = '" + tempcamera.getMinMax() + "', `LABEL` = '" + tempcamera.getLabel() + "' WHERE `TRACKID` = '" + tempcamera.getTrack().getId() + "' AND `INDEX` = '" + tempcamera.getIndex() + "';");
+            addCamera(tempcamera);
         }
     }
 
@@ -151,6 +151,18 @@ public final class Camera extends JavaPlugin {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        // --NEW--
+        try {
+            DB.executeUpdate("""
+                        CREATE TABLE IF NOT EXISTS `Camera_Players` (
+                          `ID` int(11) NOT NULL AUTO_INCREMENT,
+                          `UUID` varchar(255) NOT NULL,
+                          `DISABLED` MEDIUMTEXT DEFAULT NULL,
+                          PRIMARY KEY (`id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;""");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -173,9 +185,14 @@ public final class Camera extends JavaPlugin {
         return cameraPlayers.get(p);
     }
     public void newCamPlayer(Player p) {
+        DB.executeUpdateAsync("INSERT INTO `Camera_Players` (`UUID`) VALUES(?);", p.getUniqueId());
         if(!cameraPlayers.containsKey(p)) {
             cameraPlayers.put(p, new CamPlayer(p));
         }
+    }
+    public void addCamPlayer(Player p, DbRow row) {
+        ArrayList<Integer> disabled = Utils.stringToDisabled(row.getString("DISABLED"));
+        cameraPlayers.put(p, new CamPlayer(p, disabled));
     }
 
 }

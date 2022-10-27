@@ -1,5 +1,6 @@
 package com.nido.camera;
 
+import co.aikar.idb.DB;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -55,7 +57,16 @@ public class cameraListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
 
         Player p = e.getPlayer();
-        plugin.newCamPlayer(p);
+        try {
+
+
+            var playerRow = DB.getFirstRow("SELECT * FROM Camera_Players WHERE UUID = '" + p.getUniqueId() + "';");
+            if(playerRow != null) {
+                plugin.addCamPlayer(p, playerRow);
+            } else {plugin.newCamPlayer(p);}
+        } catch (SQLException s) {s.printStackTrace();}
+
+
 
     }
     @EventHandler
@@ -101,16 +112,41 @@ public class cameraListener implements Listener {
         }
     }
     @EventHandler
-    public void onClick(InventoryClickEvent e){
+    public void onLClick(InventoryClickEvent e){
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
         HashMap<Integer, Cam> cameraItems = camPlayer.getCameraItems();
         if (camPlayer.isInv()){
             e.setCancelled(true);
-            if (cameraItems.containsKey(e.getSlot())) {
-                Cam camera = cameraItems.get(e.getSlot());
-                camera.tpPlayer(p);
-                e.getInventory().close();
+            if (e.getClick() == ClickType.LEFT){
+                if (cameraItems.containsKey(e.getSlot())) {
+                    Cam camera = cameraItems.get(e.getSlot());
+                    camera.tpPlayer(p);
+                    e.getInventory().close();
+                }
+            }
+        }
+    }
+    // --NEW--
+    @EventHandler
+    public void onRClick(InventoryClickEvent e){
+
+        Player p = (Player) e.getWhoClicked();
+        CamPlayer camPlayer = plugin.getPlayer(p);
+        HashMap<Integer, Cam> cameraItems = camPlayer.getCameraItems();
+        if (camPlayer.isInv()){
+            e.setCancelled(true);
+            if (e.getClick() == ClickType.RIGHT){
+                if (cameraItems.containsKey(e.getSlot())) {
+                    Cam camera = cameraItems.get(e.getSlot());
+                    if (camPlayer.isCameraDisabled(camera.getId())){
+                        camPlayer.enableCamera(camera.getId());
+                    }else {
+                        camPlayer.disableCamera(camera.getId());
+                    }
+                    e.getInventory().close();
+                    Utils.openMenu(p);
+                }
             }
         }
     }
@@ -118,7 +154,7 @@ public class cameraListener implements Listener {
     public void onDrag(InventoryDragEvent e){
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
-        if (camPlayer.isInv() == true){
+        if (camPlayer.isInv()){
             e.setCancelled(true);
         }
     }
@@ -127,7 +163,7 @@ public class cameraListener implements Listener {
         Player p = (Player) e.getPlayer();
         CamPlayer camPlayer = plugin.getPlayer(p);
         if(e.getInventory().getType() == InventoryType.CHEST) {
-            if (camPlayer.isInv() == true) {
+            if (camPlayer.isInv()) {
                 camPlayer.setInv(false);
             }
         }
