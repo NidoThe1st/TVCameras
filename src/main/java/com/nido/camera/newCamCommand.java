@@ -140,31 +140,6 @@ public class newCamCommand extends BaseCommand {
     @CommandPermission("cameras.menu")
     @Subcommand("menu|m")
     public static void onMenu(Player player){
-        CamPlayer camPlayer = plugin.getPlayer(player);
-        AtomicInteger counter = new AtomicInteger(10);
-        Inventory inv = Bukkit.createInventory(player,54, ChatColor.AQUA.toString() + ChatColor.BOLD + "Camera Menu");
-        HashMap<Integer, Cam> cameraitems = new HashMap<>();
-        SkullBuilder cameraTemplate = new SkullBuilder(Material.PLAYER_HEAD, 1)
-                .setDisplayName("Camera")
-                .setLore("Click to teleport!")
-                .setOwner("e43a2867-f7f1-5dd2-9f3c-6eb405548153");
-        for (Cam camera: plugin.getCameras()) {
-            if(camera.getTrack() != Utils.getClosestTrack(player)) {continue;}
-            if(camera.getLabel() != null) {
-                cameraTemplate.setDisplayName(camera.getLabel());
-            }else {
-                cameraTemplate.setDisplayName(String.valueOf(camera.getIndex()));
-            }
-            cameraTemplate.setAmmount(camera.getIndex());
-            if(counter.get() + 1 % 9 == 0) {counter.addAndGet(2);}
-            if(counter.get() > 43) {break;}
-            cameraitems.put(counter.get(), camera);
-            inv.setItem(counter.getAndAdd(1), cameraTemplate.build());
-        }
-        camPlayer.setCameraItems(cameraitems);
-        camPlayer.setInv(true);
-        System.out.println(camPlayer.isInv());
-        player.openInventory(inv);
-
+        Utils.openMenu(player);
     }
 }
