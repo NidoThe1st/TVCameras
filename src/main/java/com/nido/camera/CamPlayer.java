@@ -1,6 +1,5 @@
 package com.nido.camera;
 
-import co.aikar.idb.DbRow;
 import io.papermc.paper.entity.LookAnchor;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Location;
@@ -8,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class CamPlayer {
     private Track editing;
@@ -17,22 +17,22 @@ public class CamPlayer {
     private Location selection1;
     private Location selection2;
     private Cam currentCamera;
-    private ArrayList<Player> followers = new ArrayList<>();
+    private List<Player> followers = new ArrayList<>();
     private HashMap<Integer, Cam> cameraItems = new HashMap<>();
     private boolean inv = false;
-    private ArrayList<Integer> disabledCameras = new ArrayList<>();
+    private List<Integer> disabledCameras = new ArrayList<>();
     private String cameraState;
 
     public CamPlayer(Player p) {
         this.p = p;
     }
 
-    public CamPlayer(Player p,ArrayList<Integer> disabledCameras){
+    public CamPlayer(Player p, List<Integer> disabledCameras){
         this.p = p;
         this.disabledCameras = disabledCameras;
 
     }
-    public ArrayList<Player> getFollowers() {
+    public List<Player> getFollowers() {
         return followers;
     }
     public void addFollower(Player follower) {
@@ -119,7 +119,7 @@ public class CamPlayer {
             disabledCameras.remove(id);
         }
     }
-    public ArrayList<Integer> getDisabledCameras() {
+    public List<Integer> getDisabledCameras() {
         return disabledCameras;
     }
 }

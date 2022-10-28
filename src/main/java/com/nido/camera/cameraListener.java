@@ -58,8 +58,6 @@ public class cameraListener implements Listener {
 
         Player p = e.getPlayer();
         try {
-
-
             var playerRow = DB.getFirstRow("SELECT * FROM Camera_Players WHERE UUID = '" + p.getUniqueId() + "';");
             if(playerRow != null) {
                 plugin.addCamPlayer(p, playerRow);

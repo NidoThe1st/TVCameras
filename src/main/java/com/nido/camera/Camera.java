@@ -11,11 +11,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public final class Camera extends JavaPlugin {
     public FileConfiguration config = getConfig();
     HashMap<Player, CamPlayer> cameraPlayers = new HashMap<>();
-    ArrayList<Cam> cameras = new ArrayList<>();
+    List<Cam> cameras = new ArrayList<>();
     //add a new camera with the name (addedcamera)
     public void addCamera(Cam camera){
         if(getCamera(camera.getTrack(), camera.getIndex()) == null) {
@@ -35,11 +36,11 @@ public final class Camera extends JavaPlugin {
     }
 
     //get all cameras
-    public ArrayList<Cam> getCameras() {
+    public List<Cam> getCameras() {
         return cameras;
     }
     public void getTrackCameras(Player p){
-        ArrayList<Integer> trackcameras = new ArrayList<>();
+        List<Integer> trackcameras = new ArrayList<>();
         StringBuilder tracks = new StringBuilder("This track has cameras with index ");
         for (Cam camera: cameras){
             if (camera.getTrack() == Utils.getClosestTrack(p)) {
@@ -64,7 +65,7 @@ public final class Camera extends JavaPlugin {
         //removes player from hashmaps
         CamPlayer camPlayer = getPlayer(player);
         camPlayer.stopFollowing();
-        ArrayList<Player> followers = new ArrayList<>(camPlayer.getFollowers());
+        List<Player> followers = new ArrayList<>(camPlayer.getFollowers());
         if(!followers.isEmpty()) {
             for (Player follower : followers) {
                 getPlayer(follower).stopFollowing();
@@ -191,8 +192,7 @@ public final class Camera extends JavaPlugin {
         }
     }
     public void addCamPlayer(Player p, DbRow row) {
-        ArrayList<Integer> disabled = Utils.stringToDisabled(row.getString("DISABLED"));
+        List<Integer> disabled = Utils.stringToDisabled(row.getString("DISABLED"));
         cameraPlayers.put(p, new CamPlayer(p, disabled));
     }
-
 }

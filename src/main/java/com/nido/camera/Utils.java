@@ -59,19 +59,15 @@ public abstract class Utils {
         return new Vector(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
     }
     //serialization of data
-    public static String disabledToString(ArrayList<Integer> cameraids) {
-        StringBuilder result = new StringBuilder();
-        for (Integer cameraid: cameraids) {
-            result.append(cameraid);
-            result.append(",");
-        }
-        result.deleteCharAt(result.length() - 1);
-        return result.toString();
+    public static String disabledToString(List<Integer> cameraIds) {
+        List<String> cameraNames = new ArrayList<>();
+        cameraIds.forEach(camera -> cameraNames.add(camera.toString()));
+        return String.join(",", cameraNames);
     }
     //deserialization of data
-    public static ArrayList<Integer> stringToDisabled(String string) {
+    public static List<Integer> stringToDisabled(String string) {
         String[] cameraidsString = string.split(",");
-        ArrayList<Integer> cameraids = new ArrayList<>();
+        List<Integer> cameraids = new ArrayList<>();
         for (String cameraidString: cameraidsString) {
             try {Integer cameraid = Integer.parseInt(cameraidString);
                 cameraids.add(cameraid);
