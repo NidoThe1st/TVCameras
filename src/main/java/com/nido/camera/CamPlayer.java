@@ -122,4 +122,5 @@ public class CamPlayer {
     public List<Integer> getDisabledCameras() {
         return disabledCameras;
     }
+
 }
