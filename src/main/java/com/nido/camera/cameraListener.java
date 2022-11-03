@@ -1,6 +1,7 @@
 package com.nido.camera;
 
 import co.aikar.idb.DB;
+import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -165,5 +166,13 @@ public class cameraListener implements Listener {
                 camPlayer.setInv(false);
             }
         }
+    }
+
+    @EventHandler
+    public void onSpectate(PlayerStartSpectatingEntityEvent e){
+
+        CamPlayer p = (CamPlayer) e.getPlayer();
+        p.stopFollowing();
+
     }
 }
