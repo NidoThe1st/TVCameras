@@ -95,7 +95,6 @@ public abstract class Utils {
                 .setDisplayName("Camera")
                 .setOwner("e43a2867-f7f1-5dd2-9f3c-6eb405548153");
         for (Cam camera: plugin.getCameras()) {
-            if(camera.getTrack() != Utils.getClosestTrack(player)) {continue;}
             if(camera.getLabel() != null) {
                 cameraTemplate.setDisplayName(camera.getLabel());
             }else {

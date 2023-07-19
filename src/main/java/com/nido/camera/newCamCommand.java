@@ -59,14 +59,14 @@ public class newCamCommand extends BaseCommand {
                 regionIndex = plugin.getCameras().size() + 1;
             }
             if (remove) {
-                if (plugin.removeCamera(regionIndex, camPlayer.getEditing())) {
+                if (plugin.removeCamera(regionIndex)) {
                     player.sendMessage(ChatColor.DARK_AQUA + "Camera " + regionIndex + " was removed from track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "There was an error removing the camera!");
                 }
             } else {
                 if(camPlayer.getSelection1() != null && camPlayer.getSelection2() != null && camPlayer.getSelection1().getWorld() == camPlayer.getSelection2().getWorld()) {
-                    plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
+                    plugin.saveNewCamera(new Cam(player.getLocation(), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
                     player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
@@ -111,22 +111,13 @@ public class newCamCommand extends BaseCommand {
     @CommandCompletion("<index>")
     public static void onViewCamera(Player player, int index){
         //checks if the index and the track actually exist
-        if(plugin.getCamera(Utils.getClosestTrack(player), index) != null) {
-            Cam camera = plugin.getCamera(Utils.getClosestTrack(player), index);
+        if(plugin.getCamera(index) != null) {
+            Cam camera = plugin.getCamera(index);
             assert camera != null;
             camera.tpPlayer(player);
             player.sendMessage(ChatColor.AQUA + "Teleported to camera number " + index + " on track " + Utils.getClosestTrack(player).getDisplayName());
         }
     }
-
-    @CommandPermission("cameras.list")
-    @Subcommand("list|l")
-    public static void onListCameras(Player p){
-        if (Utils.getClosestTrack(p) != null){
-            plugin.getTrackCameras(p);
-        }
-    }
-
     @CommandPermission("cameras.menu")
     @Subcommand("menu|m")
     public static void onMenu(Player player){
