@@ -1,7 +1,7 @@
 package com.nido.camera;
 
+import me.makkuusen.timing.system.api.TimingSystemAPI;
 import me.makkuusen.timing.system.track.Track;
-import me.makkuusen.timing.system.track.TrackDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -20,7 +20,7 @@ import static com.nido.camera.newCamCommand.plugin;
 public abstract class Utils {
 
     public static Track getClosestTrack(Player p) {
-        List<Track> tracks = TrackDatabase.getTracks();
+        List<Track> tracks = TimingSystemAPI.getTracks();
         Location playerLoc = p.getLocation();
         Track closest = null;
         for (Track track: tracks) {
