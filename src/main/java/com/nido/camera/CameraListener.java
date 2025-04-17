@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class cameraListener implements Listener {
+public class CameraListener implements Listener {
     Camera plugin = Camera.getInstance();
 
     @EventHandler

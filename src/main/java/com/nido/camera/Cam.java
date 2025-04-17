@@ -7,7 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import static com.nido.camera.newCamCommand.plugin;
+import static com.nido.camera.CameraCommand.plugin;
 
 public class Cam {
 
@@ -41,44 +41,25 @@ public class Cam {
         this.maxp = Utils.stringToVector(MinAndMax[1]);
     }
 
+    // Teleport player to camera
     public void tpPlayer(Player cameraman) {
         CamPlayer camPlayer = plugin.getPlayer(cameraman);
+        // Checks if camera is active, if yes executes
         if (!camPlayer.isCameraDisabled(id)){
             cameraman.teleport(camlocation);
         }
     }
 
-    public Location getLocation() {
-        return camlocation;
-    }
-
-    public Track getTrack() {
-        return camTrack;
-    }
-    public String getLabel() {return label;}
-
-    public int getIndex() {
-        return index;
-    }
-    public String getMinMax() {
-        return minp.getBlockX() +
-                "," +
-                minp.getBlockY() +
-                "," +
-                minp.getBlockZ() +
-                ":" +
-                maxp.getBlockX() +
-                "," +
-                maxp.getBlockY() +
-                "," +
-                maxp.getBlockZ();
-    }
     public boolean isInsideRegion(Player p) {
         Vector pLoc = p.getLocation().toVector();
         return pLoc.isInAABB(minp, maxp);
     }
-    public Integer getId() {
-        return id;
-    }
 
+    public Integer getId() {return id;}
+    public Location getLocation() {return camlocation;}
+    public Track getTrack() {return camTrack;}
+    public String getLabel() {return label;}
+    public int getIndex() {return index;}
+    public String getMinMax() {return minp.getBlockX() + "," + minp.getBlockY() + "," + minp.getBlockZ() +
+                                ":" + maxp.getBlockX() + "," + maxp.getBlockY() + "," + maxp.getBlockZ();}
 }

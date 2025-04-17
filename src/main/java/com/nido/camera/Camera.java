@@ -75,7 +75,7 @@ public final class Camera extends JavaPlugin {
         cameraPlayers.remove(player);
     }
     private void loadCameras() throws SQLException {
-        //gets the data for the cameras from the dat//abase
+        //gets the data for the cameras from the database
         var locations = DB.getResults("SELECT * FROM `Cameras`;");
         //going through every result in the database
         for (DbRow dbRow : locations) {
@@ -124,14 +124,14 @@ public final class Camera extends JavaPlugin {
         options.setMaxConnections(10);
         Database db = new HikariPooledDatabase(options);
         DB.setGlobalDatabase(db);
-        getServer().getPluginManager().registerEvents(new cameraListener(), this);
+        getServer().getPluginManager().registerEvents(new CameraListener(), this);
 
 
 
         PaperCommandManager manager = new PaperCommandManager(this);
         // enable brigadier integration for paper servers
         manager.enableUnstableAPI("brigadier");
-        manager.registerCommand(new newCamCommand());
+        manager.registerCommand(new CameraCommand());
         //load data from db
         try {
             try {

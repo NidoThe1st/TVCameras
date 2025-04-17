@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 
 @CommandAlias("camera|cam")
-public class newCamCommand extends BaseCommand {
+public class CameraCommand extends BaseCommand {
 
     static Camera plugin = Camera.getInstance();
     @HelpCommand
@@ -29,7 +29,9 @@ public class newCamCommand extends BaseCommand {
     @CommandPermission("cameras.edit")
     @Subcommand("edit|e")
     public static void onEdit(Player player) {
+        // Get player from the hashmap
         CamPlayer camPlayer = plugin.getPlayer(player);
+        // If player already editing stop, if not start
         if(!camPlayer.isEditing()) {
             camPlayer.startEditing(Utils.getClosestTrack(player));
             player.sendMessage(ChatColor.AQUA + "Started editing cameras at " + Utils.getClosestTrack(player).getDisplayName());
@@ -46,7 +48,7 @@ public class newCamCommand extends BaseCommand {
         if(camPlayer.isEditing()) {
             int regionIndex;
             boolean remove = false;
-            //check if index exists
+            //check if index exists, if not automatically make the new camera next available index
             if (index != null) {
                 remove = getParsedRemoveFlag(index);
                 //checks if index is a valid number
@@ -58,6 +60,7 @@ public class newCamCommand extends BaseCommand {
             } else {
                 regionIndex = plugin.getCameras().size() + 1;
             }
+            //checks if index is negative, if it is it deletes the camera
             if (remove) {
                 if (plugin.removeCamera(regionIndex, camPlayer.getEditing())) {
                     player.sendMessage(ChatColor.DARK_AQUA + "Camera " + regionIndex + " was removed from track " + camPlayer.getEditing().getDisplayName());
@@ -89,11 +92,11 @@ public class newCamCommand extends BaseCommand {
         plugin.getPlayer(follower).stopFollowing();
         follower.sendMessage( ChatColor.DARK_AQUA + "You stopped following!");
     }
-    //checks if index should be removed
+    //checks if index should be removed (returns true if index starts with -)
     private static boolean getParsedRemoveFlag(String index) {
         return index.startsWith("-");
     }
-    //gives an index that should be added/removed
+    //gives an index that should be added/removed (removes +/-)
     private static Integer getParsedIndex(String index) {
         if (index.startsWith("-")) {
             index = index.substring(1);
