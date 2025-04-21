@@ -1,5 +1,7 @@
 package com.nido.camera;
 
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
 import me.makkuusen.timing.system.api.TimingSystemAPI;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
@@ -8,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -17,8 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.nido.camera.CameraCommand.plugin;
 
-public abstract class Utils {
-
+public class Utils {
     public static Track getClosestTrack(Player p) {
         List<Track> tracks = TimingSystemAPI.getTracks();
         Location playerLoc = p.getLocation();
@@ -58,6 +60,7 @@ public abstract class Utils {
         String[] xyz = s.split(",");
         return new Vector(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
     }
+
     //serialization of data
     public static String disabledToString(List<Integer> cameraIds) {
         List<String> cameraNames = new ArrayList<>();

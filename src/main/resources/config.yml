@@ -1,5 +1,5 @@
-username: "username"
-password: "password"
-database: "database"
+host: 'host'
 port: 3306
-ip: "0.0.0.0"
+database: 'database'
+username: 'user'
+password: 'pass'

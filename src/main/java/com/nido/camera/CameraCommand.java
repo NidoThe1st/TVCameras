@@ -3,15 +3,23 @@ package com.nido.camera;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.regions.Region;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 
 @CommandAlias("camera|cam")
 public class CameraCommand extends BaseCommand {
 
     static Camera plugin = Camera.getInstance();
+    static Utils utils = new Utils();
     @HelpCommand
     public static void onHelp(CommandSender sender) {
         sender.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Cameras 1.0 help");
@@ -26,6 +34,7 @@ public class CameraCommand extends BaseCommand {
         sender.sendMessage(ChatColor.AQUA + "/camera stopfollow");
         sender.sendMessage(ChatColor.DARK_AQUA + "- You stop following a player");
     }
+
     @CommandPermission("cameras.edit")
     @Subcommand("edit|e")
     public static void onEdit(Player player) {
@@ -43,7 +52,7 @@ public class CameraCommand extends BaseCommand {
     @CommandPermission("cameras.set")
     @Subcommand("set|s")
     @CommandCompletion("<index>, [label]")
-    public static void onCameraSet(Player player,  @Optional String index, @Optional String label) {
+    public static void onCameraSet(Player player,  @Optional String index, @Optional String label) throws IncompleteRegionException {
         CamPlayer camPlayer = plugin.getPlayer(player);
         if(camPlayer.isEditing()) {
             int regionIndex;
@@ -68,12 +77,23 @@ public class CameraCommand extends BaseCommand {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "There was an error removing the camera!");
                 }
             } else {
-                if(camPlayer.getSelection1() != null && camPlayer.getSelection2() != null && camPlayer.getSelection1().getWorld() == camPlayer.getSelection2().getWorld()) {
-                    plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
+                //test for worldedit integration
+                Region s = plugin.getWorldEdit().getSession(player).getSelection();
+                Vector maxP = utils.stringToVector(s.getMaximumPoint().toParserString());
+                Vector minP = utils.stringToVector(s.getMinimumPoint().toParserString());
+                if (s != null){
+                    plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, minP, maxP, label));
                     player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
                 }
+                //checks for selection, saves the camera
+                /*if(camPlayer.getSelection1() != null && camPlayer.getSelection2() != null && camPlayer.getSelection1().getWorld() == camPlayer.getSelection2().getWorld()) {
+                    plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, Utils.getMin(camPlayer.getSelection1(), camPlayer.getSelection2()), Utils.getMax(camPlayer.getSelection1(), camPlayer.getSelection2()), label));
+                    player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
+                } else {
+                    player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
+                }*/
             }
         } else {
             player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Enter edit mode first!");

@@ -86,6 +86,11 @@
             <id>boatlabs</id>
             <url>https://repo.boatlabs.net/repository/maven/</url>
         </repository>
+        <repository>
+            <id>worldedit</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -126,6 +131,12 @@
             <artifactId>maven-shade-plugin</artifactId>
             <version>3.5.3</version>
             <type>maven-plugin</type>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.10</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
