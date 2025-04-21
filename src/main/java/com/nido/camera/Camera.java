@@ -2,10 +2,13 @@ package com.nido.camera;
 
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.idb.*;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.makkuusen.timing.system.track.Track;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -112,7 +115,7 @@ public final class Camera extends JavaPlugin {
         String password = config.getString("password");
         String database = config.getString("database");
         int port = config.getInt("port");
-        String host = config.getString("ip");
+        String host = config.getString("host");
         assert username != null;
         assert password != null;
         assert database != null;
@@ -194,5 +197,14 @@ public final class Camera extends JavaPlugin {
     public void addCamPlayer(Player p, DbRow row) {
         List<Integer> disabled = Utils.stringToDisabled(row.getString("DISABLED"));
         cameraPlayers.put(p, new CamPlayer(p, disabled));
+    }
+    public WorldEditPlugin getWorldEdit(){
+        Plugin p = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+
+        if (p instanceof WorldEditPlugin){
+            return (WorldEditPlugin) p;
+        }else {
+            return null;
+        }
     }
 }

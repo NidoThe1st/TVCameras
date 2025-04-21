@@ -69,48 +69,6 @@ public class CameraListener implements Listener {
 
     }
     @EventHandler
-    public void rClickBlock(PlayerInteractEvent e) {
-        CamPlayer player = plugin.getPlayer(e.getPlayer());
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-        if (Objects.requireNonNull(e.getHand()).toString().equals("OFF_HAND")) {
-            return;
-        }
-        Block block = e.getClickedBlock();
-        if (block == null) {
-            return;
-        }
-        if(player.isEditing() && Objects.requireNonNull(e.getPlayer().getInventory().getItem(EquipmentSlot.HAND)).getType() == Material.STICK){
-            player.setSelection(2, block.getLocation());
-            e.getPlayer().sendMessage(ChatColor.AQUA + "Set position 2");
-            e.setCancelled(true);
-        }
-    }
-    @EventHandler
-    public void lClickBlock(PlayerInteractEvent e) {
-        CamPlayer player = plugin.getPlayer(e.getPlayer());
-        if (e.getAction() != Action.LEFT_CLICK_BLOCK) {
-            return;
-        }
-        Block block = e.getClickedBlock();
-        if (block == null) {
-            return;
-        }
-        if(player.isEditing() && Objects.requireNonNull(e.getPlayer().getInventory().getItem(EquipmentSlot.HAND)).getType() == Material.STICK){
-            player.setSelection(1, block.getLocation());
-            e.getPlayer().sendMessage(ChatColor.AQUA + "Set position 1");
-            e.setCancelled(true);
-        }
-    }
-    @EventHandler
-    public void lClickBlock(BlockBreakEvent e) {
-        CamPlayer player = plugin.getPlayer(e.getPlayer());
-        if(player.isEditing() && Objects.requireNonNull(e.getPlayer().getInventory().getItem(EquipmentSlot.HAND)).getType() == Material.STICK){
-            e.setCancelled(true);
-        }
-    }
-    @EventHandler
     public void onLClick(InventoryClickEvent e){
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);

@@ -1,5 +1,5 @@
-username: "username"
-password: "password"
-database: "database"
+host: '144.76.157.114'
 port: 3306
-ip: "0.0.0.0"
+database: 's1_nido_test'
+username: 'u1_qK2HdppCph'
+password: '^R8dEhdq5H=bm5c7b@WcxlnN'
