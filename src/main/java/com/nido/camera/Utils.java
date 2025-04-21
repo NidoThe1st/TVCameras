@@ -61,12 +61,6 @@ public class Utils {
         return new Vector(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
     }
 
-    public static Vector stringToVectorFromBV(String s) {
-        String str = s.substring(1, s.length() - 1);
-        String[] xyz = str.split(",");
-        return new Vector(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
-    }
-
     //serialization of data
     public static String disabledToString(List<Integer> cameraIds) {
         List<String> cameraNames = new ArrayList<>();

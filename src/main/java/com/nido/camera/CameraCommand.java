@@ -35,24 +35,6 @@ public class CameraCommand extends BaseCommand {
         sender.sendMessage(ChatColor.DARK_AQUA + "- You stop following a player");
     }
 
-    @Default
-    public static void onCam(Player player){
-
-        Player p = player;
-
-        Inventory inv = Bukkit.createInventory(p, 54, "Camera Menu");
-
-        ItemBuilder test = new ItemBuilder(Material.ACACIA_DOOR, 1);
-        test.setDisplayName("Enter if you dare!");
-        test.setLore("Only for the really brave...");
-        ItemStack horrorDoor = test.build();
-
-        inv.setItem(22, horrorDoor);
-
-        p.openInventory(inv);
-
-    }
-
     @CommandPermission("cameras.edit")
     @Subcommand("edit|e")
     public static void onEdit(Player player) {
