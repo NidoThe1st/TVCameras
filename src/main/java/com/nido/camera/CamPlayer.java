@@ -1,13 +1,12 @@
 package com.nido.camera;
 
 import io.papermc.paper.entity.LookAnchor;
+import lombok.Getter;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CamPlayer {
     private Track editing;
@@ -22,6 +21,11 @@ public class CamPlayer {
     private boolean inv = false;
     private List<Integer> disabledCameras = new ArrayList<>();
     private String cameraState;
+    @Getter
+    //list of all players that are editing
+    private static Set<UUID> editors = new HashSet<>();
+    //list of tracks that players are editing
+    private static final HashMap<UUID, Track> editorTracks = new HashMap<>();
 
     public CamPlayer(Player p) {
         this.p = p;
@@ -32,6 +36,27 @@ public class CamPlayer {
         this.disabledCameras = disabledCameras;
 
     }
+
+    public static void setEditors(Player player, boolean add){
+        if (add){
+            editors.add(player.getUniqueId());
+        } else {
+            editors.remove(player.getUniqueId());
+        }
+    }
+
+    public static void setEditorTracks(UUID uuid, Track track){
+        editorTracks.put(uuid, track);
+    }
+
+    public static void removeEditorTracks(UUID uuid){
+        editorTracks.remove(uuid);
+    }
+
+    public static Optional<Track> getEditorTracks(UUID uuid){
+        return Optional.ofNullable(editorTracks.get(uuid));
+    }
+
     public List<Player> getFollowers() {
         return followers;
     }
