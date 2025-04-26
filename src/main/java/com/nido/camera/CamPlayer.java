@@ -37,12 +37,20 @@ public class CamPlayer {
 
     }
 
-    public static void setEditors(Player player, boolean add, Track track){
+    public static void setEditors(Player player, boolean add){
         if (add){
             editors.add(player.getUniqueId());
         } else {
             editors.remove(player.getUniqueId());
         }
+    }
+
+    public static void setEditorTracks(UUID uuid, Track track){
+        editorTracks.put(uuid, track);
+    }
+
+    public static void removeEditorTracks(UUID uuid){
+        editorTracks.remove(uuid);
     }
 
     public static Optional<Track> getEditorTracks(UUID uuid){

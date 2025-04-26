@@ -1,20 +1,37 @@
 package com.nido.camera;
 
-import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+import org.checkerframework.checker.units.qual.K;
 
-import javax.swing.plaf.synth.Region;
-import java.sql.SQLException;
 import java.util.*;
 
-public class Tasks {
+public class CameraEditor {
 
-    public Tasks(){}
+    private static HashMap<String, Track> trackRegions = new HashMap<>();
+
+    public static void setTrackRegions(String minmax, Track track){
+        trackRegions.put(minmax, track);
+    }
+
+    public static void removeTrackRegions(String minmax){
+        trackRegions.remove(minmax);
+    }
+
+    public static Set<String> getKeysByValue(Map<String, Track> map, Track value){
+        Set<String> keys = new HashSet<>();
+        for (Map.Entry<String, Track> entry : map.entrySet()){
+            if (Objects.equals(entry.getValue(), value)){
+                keys.add(entry.getKey());
+            }
+        }
+        return keys;
+    }
 
     public void startParticleSpawner(Camera plugin){
         Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
@@ -22,20 +39,15 @@ public class Tasks {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null) continue;
                 Track track = CamPlayer.getEditorTracks(uuid).orElseThrow();
+                Set<String> regions = getKeysByValue(trackRegions, track);
 
-                //insert getting regions on that track and calling setParticles
-                List<DbRow> regions;
-                try {
-                    regions = DB.getResults("SELECT `REGION` FROM `Cameras` WHERE `TRACKID` = '" + track + "';");
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
 
-                for (DbRow dbRow : regions) {
-                    String regionMinMax = dbRow.getString("REGION");
-                    String[] regionMinAndMax = regionMinMax.split(":");
-                    Location min = Utils.stringToLocation(regionMinAndMax[0]);
-                    Location max = Utils.stringToLocation(regionMinAndMax[1]);
+                for (String region : regions) {
+
+                    String[] minAndMax = region.split(":");
+
+                    Vector min = Utils.stringToVector(minAndMax[0]);
+                    Vector max = Utils.stringToVector(minAndMax[1]);
 
                     int maxY = max.getBlockY() + 1;
                     int maxX = max.getBlockX() + 1;
@@ -81,5 +93,4 @@ public class Tasks {
             player.spawnParticle(particle, x, y, z, 20);
         }
     }
-
 }

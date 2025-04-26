@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.C;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -167,8 +168,8 @@ public final class Camera extends JavaPlugin {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        Tasks tasks = new Tasks();
-        tasks.startParticleSpawner(this);
+        CameraEditor cameraEditor = new CameraEditor();
+        cameraEditor.startParticleSpawner(this);
     }
 
     @Override
