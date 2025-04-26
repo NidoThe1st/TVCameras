@@ -167,6 +167,8 @@ public final class Camera extends JavaPlugin {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        Tasks tasks = new Tasks();
+        tasks.startParticleSpawner(this);
     }
 
     @Override
