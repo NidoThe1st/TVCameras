@@ -43,8 +43,10 @@ public class CameraCommand extends BaseCommand {
         // If player already editing stop, if not start
         if(!camPlayer.isEditing()) {
             camPlayer.startEditing(Utils.getClosestTrack(player));
+            CamPlayer.setEditors(player, true, camPlayer.getEditing());
             player.sendMessage(ChatColor.AQUA + "Started editing cameras at " + Utils.getClosestTrack(player).getDisplayName());
         } else {
+            CamPlayer.setEditors(player, false, camPlayer.getEditing());
             camPlayer.stopEditing();
             player.sendMessage(ChatColor.DARK_AQUA + "Stopped editing cameras.");
         }
