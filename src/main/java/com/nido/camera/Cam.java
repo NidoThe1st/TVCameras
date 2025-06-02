@@ -67,4 +67,7 @@ public class Cam {
     public int getIndex() {return index;}
     public String getMinMax() {return minp.getBlockX() + "," + minp.getBlockY() + "," + minp.getBlockZ() +
                                 ":" + maxp.getBlockX() + "," + maxp.getBlockY() + "," + maxp.getBlockZ();}
+    public Vector getMin() {return minp;}
+    public Vector getMax() {return maxp;}
+
 }

@@ -42,16 +42,17 @@ public final class Camera extends JavaPlugin {
         return null;
     }
 
+    // FIX FIX FIX
     public void getTrackCameras(Player p){
         List<Integer> trackcameras = new ArrayList<>();
-        StringBuilder tracks = new StringBuilder("This track has cameras with index");
+        StringBuilder tracks = new StringBuilder("This track has cameras with index ");
         for (Cam camera: cameras){
             if (camera.getTrack() == Utils.getClosestTrack(p)) {
                 Integer camIndex = camera.getIndex();
                 trackcameras.add(camIndex);
             }
 
-            for (int index: trackcameras) {
+            for (int index : trackcameras) {
                 tracks.append(index).append(" ");
             }
             tracks.deleteCharAt(tracks.length() - 1);

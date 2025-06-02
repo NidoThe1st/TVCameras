@@ -7,6 +7,7 @@ import co.aikar.idb.DB;
 import co.aikar.idb.DbRow;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
+import me.makkuusen.timing.system.track.Track;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -43,33 +44,10 @@ public class CameraCommand extends BaseCommand {
         CamPlayer camPlayer = plugin.getPlayer(player);
         // If player already editing stop, if not start
         if(!camPlayer.isEditing()) {
-            camPlayer.startEditing(Utils.getClosestTrack(player));
-            CamPlayer.setEditors(player, true);
-            CamPlayer.setEditorTracks(player.getUniqueId(), Utils.getClosestTrack(player));
-            List<DbRow> minmaxes;
-            try {
-                minmaxes = DB.getResults("SELECT `REGION` FROM `Cameras` WHERE `TRACKID` = '" + Utils.getClosestTrack(player).getId() + "';");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            for (DbRow region : minmaxes){
-                String minMax = region.getString("REGION");
-                CameraEditor.setTrackRegions(minMax, Utils.getClosestTrack(player));
-            }
-            player.sendMessage(ChatColor.AQUA + "Started editing cameras at " + Utils.getClosestTrack(player).getDisplayName());
+            Track track = Utils.getClosestTrack(player);
+            camPlayer.startEditing(track);
+            player.sendMessage(ChatColor.AQUA + "Started editing cameras at " + track.getDisplayName());
         } else {
-            CamPlayer.setEditors(player, false);
-            CamPlayer.removeEditorTracks(player.getUniqueId());
-            List<DbRow> minmaxes;
-            try {
-                minmaxes = DB.getResults("SELECT `REGION` FROM `Cameras` WHERE `TRACKID` = '" + Utils.getClosestTrack(player).getId() + "';");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            for (DbRow region : minmaxes){
-                String minMax = region.getString("REGION");
-                CameraEditor.removeTrackRegions(minMax);
-            }
             camPlayer.stopEditing();
             player.sendMessage(ChatColor.DARK_AQUA + "Stopped editing cameras.");
         }
@@ -102,9 +80,6 @@ public class CameraCommand extends BaseCommand {
                     throw new RuntimeException(e);
                 }
                 String regionDelete = region.getString("REGION");
-                //DELETE AFTER TEST \/
-                System.out.println(regionDelete);
-                //DELETE AFTER TEST /\
                 CameraEditor.removeTrackRegions(regionDelete);
                 if (plugin.removeCamera(regionIndex, camPlayer.getEditing())) {
                     player.sendMessage(ChatColor.DARK_AQUA + "Camera " + regionIndex + " was removed from track " + camPlayer.getEditing().getDisplayName());

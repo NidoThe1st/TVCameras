@@ -11,10 +11,9 @@ import java.util.*;
 public class CamPlayer {
     private Track editing;
     private Camera plugin = Camera.getInstance();
+    @Getter
     private Player p;
     private CamPlayer following;
-    private Location selection1;
-    private Location selection2;
     private Cam currentCamera;
     private List<Player> followers = new ArrayList<>();
     private HashMap<Integer, Cam> cameraItems = new HashMap<>();
@@ -23,7 +22,7 @@ public class CamPlayer {
     private String cameraState;
     @Getter
     //list of all players that are editing
-    private static Set<UUID> editors = new HashSet<>();
+    private static Set<CamPlayer> editors = new HashSet<>();
     //list of tracks that players are editing
     private static final HashMap<UUID, Track> editorTracks = new HashMap<>();
 
@@ -34,14 +33,13 @@ public class CamPlayer {
     public CamPlayer(Player p, List<Integer> disabledCameras){
         this.p = p;
         this.disabledCameras = disabledCameras;
-
     }
 
-    public static void setEditors(Player player, boolean add){
+    public static void setEditors(CamPlayer camPlayer, boolean add){
         if (add){
-            editors.add(player.getUniqueId());
+            editors.add(camPlayer);
         } else {
-            editors.remove(player.getUniqueId());
+            editors.remove(camPlayer);
         }
     }
 
@@ -82,18 +80,15 @@ public class CamPlayer {
             following = null;
         }
     }
-    public void setSelection(int nr, Location loc) {
-        if(nr == 1) {
-            selection1 = loc;
-        } else {
-            selection2 = loc;
-        }
-    }
-    public Location getSelection1() {return selection1;}
-    public Location getSelection2() {return selection2;}
     public boolean isEditing() {return editing != null;}
-    public void startEditing(Track track) {editing = track;}
-    public void stopEditing() {editing = null;}
+    public void startEditing(Track track) {
+        editing = track;
+        CamPlayer.setEditors(this, true);
+    }
+    public void stopEditing() {
+        editing = null;
+        CamPlayer.setEditors(this, false);
+    }
     public void setCurrentCamera(Cam camera) {
         currentCamera = camera;
     }
