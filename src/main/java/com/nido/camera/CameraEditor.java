@@ -1,13 +1,10 @@
 package com.nido.camera;
 
-import co.aikar.idb.DbRow;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.checkerframework.checker.units.qual.K;
 
 import java.util.*;
 
@@ -21,6 +18,10 @@ public class CameraEditor {
 
     public static void removeTrackRegions(String minmax){
         trackRegions.remove(minmax);
+    }
+
+    public static Map<String, Track> getTrackRegions(){
+        return trackRegions;
     }
 
     public static Set<String> getKeysByValue(Map<String, Track> map, Track value){
