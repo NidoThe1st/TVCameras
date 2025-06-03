@@ -11,18 +11,18 @@ import java.util.*;
 public class CamPlayer {
     @Getter
     private Track editing;
-    private Camera plugin = Camera.getInstance();
+    private CameraPlugin plugin = CameraPlugin.getInstance();
     @Getter
     private Player p;
     private CamPlayer following;
     @Getter
     @Setter
-    private Cam currentCamera;
+    private Camera currentCamera;
     @Getter
     private List<Player> followers = new ArrayList<>();
     @Getter
     @Setter
-    private HashMap<Integer, Cam> cameraItems = new HashMap<>();
+    private HashMap<Integer, Camera> cameraItems = new HashMap<>();
     @Getter
     private boolean inv = false;
     @Getter
@@ -80,7 +80,7 @@ public class CamPlayer {
         CamPlayer.setEditors(this, false);
     }
 
-    public void setBestCam(Cam camera) {
+    public void setBestCam(Camera camera) {
         for (Player follower: followers) {
             CamPlayer camPlayer = plugin.getPlayer(follower);
             if(camPlayer.getCurrentCamera() != camera) {

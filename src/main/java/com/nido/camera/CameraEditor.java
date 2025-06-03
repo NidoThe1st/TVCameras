@@ -8,14 +8,14 @@ import org.bukkit.util.Vector;
 
 public class CameraEditor {
 
-    public void startParticleSpawner(Camera plugin){
+    public void startParticleSpawner(CameraPlugin plugin){
         Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (CamPlayer camPlayer : CamPlayer.getEditors()) {
                 Player player = camPlayer.getP();
                 if (player == null) continue;
                 Track track = camPlayer.getEditing();
 
-                for (Cam camera : Camera.getInstance().cameras) {
+                for (Camera camera : CameraPlugin.getInstance().cameras) {
                     if (camera.getTrack().getId() != track.getId()) {
                         continue;
                     }

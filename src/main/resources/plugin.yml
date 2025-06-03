@@ -2,7 +2,7 @@ name: Camera
 authors: [NidoThe1st, BoatHub]
 version: '${project.version}'
 depend: [TimingSystem]
-main: com.nido.camera.Camera
+main: com.nido.camera.CameraPlugin
 api-version: 1.19
 commands:
   cam:

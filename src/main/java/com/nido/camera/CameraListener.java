@@ -3,40 +3,32 @@ package com.nido.camera;
 import co.aikar.idb.DB;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import me.makkuusen.timing.system.track.Track;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.*;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Objects;
 
 public class CameraListener implements Listener {
-    Camera plugin = Camera.getInstance();
+    CameraPlugin plugin = CameraPlugin.getInstance();
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
         CamPlayer camPlayer = plugin.getPlayer(p);
+        Track track = Utils.getClosestTrack(p);
         //check if player is inside a boat
         if(p.isInsideVehicle() && p.getVehicle() instanceof Boat) {
             //check if player is followed
 
             if(!camPlayer.getFollowers().isEmpty()) {
-                Track track = Utils.getClosestTrack(p);
-                for (Cam camera : plugin.getCameras()) {
+                for (Camera camera : plugin.getCameras()) {
                     if (camera.getTrack() == track) {
                         if (camera.isInsideRegion(p)) {
                             camPlayer.setBestCam(camera);
@@ -72,12 +64,12 @@ public class CameraListener implements Listener {
     public void onLClick(InventoryClickEvent e){
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
-        HashMap<Integer, Cam> cameraItems = camPlayer.getCameraItems();
+        HashMap<Integer, Camera> cameraItems = camPlayer.getCameraItems();
         if (camPlayer.isInv()){
             e.setCancelled(true);
             if (e.getClick() == ClickType.LEFT){
                 if (cameraItems.containsKey(e.getSlot())) {
-                    Cam camera = cameraItems.get(e.getSlot());
+                    Camera camera = cameraItems.get(e.getSlot());
                     camera.tpPlayer(p);
                     e.getInventory().close();
                 }
@@ -90,12 +82,12 @@ public class CameraListener implements Listener {
 
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
-        HashMap<Integer, Cam> cameraItems = camPlayer.getCameraItems();
+        HashMap<Integer, Camera> cameraItems = camPlayer.getCameraItems();
         if (camPlayer.isInv()){
             e.setCancelled(true);
             if (e.getClick() == ClickType.RIGHT){
                 if (cameraItems.containsKey(e.getSlot())) {
-                    Cam camera = cameraItems.get(e.getSlot());
+                    Camera camera = cameraItems.get(e.getSlot());
                     if (camPlayer.isCameraDisabled(camera.getId())){
                         camPlayer.enableCamera(camera.getId());
                     }else {
