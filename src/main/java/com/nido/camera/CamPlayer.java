@@ -2,29 +2,34 @@ package com.nido.camera;
 
 import io.papermc.paper.entity.LookAnchor;
 import lombok.Getter;
+import lombok.Setter;
 import me.makkuusen.timing.system.track.Track;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
 public class CamPlayer {
+    @Getter
     private Track editing;
     private Camera plugin = Camera.getInstance();
     @Getter
     private Player p;
     private CamPlayer following;
+    @Getter
+    @Setter
     private Cam currentCamera;
+    @Getter
     private List<Player> followers = new ArrayList<>();
+    @Getter
+    @Setter
     private HashMap<Integer, Cam> cameraItems = new HashMap<>();
+    @Getter
     private boolean inv = false;
+    @Getter
     private List<Integer> disabledCameras = new ArrayList<>();
     private String cameraState;
     @Getter
-    //list of all players that are editing
     private static Set<CamPlayer> editors = new HashSet<>();
-    //list of tracks that players are editing
-    private static final HashMap<UUID, Track> editorTracks = new HashMap<>();
 
     public CamPlayer(Player p) {
         this.p = p;
@@ -43,21 +48,6 @@ public class CamPlayer {
         }
     }
 
-    public static void setEditorTracks(UUID uuid, Track track){
-        editorTracks.put(uuid, track);
-    }
-
-    public static void removeEditorTracks(UUID uuid){
-        editorTracks.remove(uuid);
-    }
-
-    public static Optional<Track> getEditorTracks(UUID uuid){
-        return Optional.ofNullable(editorTracks.get(uuid));
-    }
-
-    public List<Player> getFollowers() {
-        return followers;
-    }
     public void addFollower(Player follower) {
         if(!followers.contains(follower)) {
             followers.add(follower);
@@ -89,12 +79,7 @@ public class CamPlayer {
         editing = null;
         CamPlayer.setEditors(this, false);
     }
-    public void setCurrentCamera(Cam camera) {
-        currentCamera = camera;
-    }
-    public Cam getCurrentCamera() {
-        return currentCamera;
-    }
+
     public void setBestCam(Cam camera) {
         for (Player follower: followers) {
             CamPlayer camPlayer = plugin.getPlayer(follower);
@@ -106,23 +91,10 @@ public class CamPlayer {
             }
         }
     }
-    public Track getEditing() {
-        return editing;
-    }
-    public boolean isInv() {
-        return inv;
-    }
 
     public void setInv(boolean inventory) {
         this.inv = inventory;
         if(!inventory) {cameraItems.clear();}
-    }
-    public void setCameraItems(HashMap<Integer, Cam> camItems) {
-        this.cameraItems = camItems;
-    }
-
-    public HashMap<Integer, Cam> getCameraItems(){
-        return cameraItems;
     }
 
     public boolean isCameraDisabled(Integer id) {
@@ -138,9 +110,6 @@ public class CamPlayer {
         if(isCameraDisabled(id)) {
             disabledCameras.remove(id);
         }
-    }
-    public List<Integer> getDisabledCameras() {
-        return disabledCameras;
     }
 
 }

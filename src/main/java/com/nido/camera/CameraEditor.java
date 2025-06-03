@@ -27,20 +27,20 @@ public class CameraEditor {
                     int maxX = max.getBlockX() + 1;
                     int maxZ = max.getBlockZ() + 1;
 
-                    drawLineX(player, Particle.HEART, min.getBlockX(), maxX, min.getBlockY(), min.getBlockZ());
-                    drawLineX(player, Particle.HEART, min.getBlockX(), maxX, maxY, min.getBlockZ());
-                    drawLineX(player, Particle.HEART, min.getBlockX(), maxX, min.getBlockY(), maxZ);
-                    drawLineX(player, Particle.HEART, min.getBlockX(), maxX, maxY, maxZ);
+                    drawLineX(player, Particle.FLAME, min.getBlockX(), maxX, min.getBlockY(), min.getBlockZ());
+                    drawLineX(player, Particle.FLAME, min.getBlockX(), maxX, maxY, min.getBlockZ());
+                    drawLineX(player, Particle.FLAME, min.getBlockX(), maxX, min.getBlockY(), maxZ);
+                    drawLineX(player, Particle.FLAME, min.getBlockX(), maxX, maxY, maxZ);
 
-                    drawLineY(player, Particle.HEART, min.getBlockX(), min.getBlockY(), maxY, min.getBlockZ());
-                    drawLineY(player, Particle.HEART, min.getBlockX(), min.getBlockY(), maxY, maxZ);
-                    drawLineY(player, Particle.HEART, maxX, min.getBlockY(), maxY, min.getBlockZ());
-                    drawLineY(player, Particle.HEART, maxX, min.getBlockY(), maxY, maxZ);
+                    drawLineY(player, Particle.FLAME, min.getBlockX(), min.getBlockY(), maxY, min.getBlockZ());
+                    drawLineY(player, Particle.FLAME, min.getBlockX(), min.getBlockY(), maxY, maxZ);
+                    drawLineY(player, Particle.FLAME, maxX, min.getBlockY(), maxY, min.getBlockZ());
+                    drawLineY(player, Particle.FLAME, maxX, min.getBlockY(), maxY, maxZ);
 
-                    drawLineZ(player, Particle.HEART, min.getBlockX(), min.getBlockY(), min.getBlockZ(), maxZ);
-                    drawLineZ(player, Particle.HEART, min.getBlockX(), maxY, min.getBlockZ(), maxZ);
-                    drawLineZ(player, Particle.HEART, maxX, min.getBlockY(), min.getBlockZ(), maxZ);
-                    drawLineZ(player, Particle.HEART, maxX, maxY, min.getBlockZ(), maxZ);
+                    drawLineZ(player, Particle.FLAME, min.getBlockX(), min.getBlockY(), min.getBlockZ(), maxZ);
+                    drawLineZ(player, Particle.FLAME, min.getBlockX(), maxY, min.getBlockZ(), maxZ);
+                    drawLineZ(player, Particle.FLAME, maxX, min.getBlockY(), min.getBlockZ(), maxZ);
+                    drawLineZ(player, Particle.FLAME, maxX, maxY, min.getBlockZ(), maxZ);
                 }
 
             }

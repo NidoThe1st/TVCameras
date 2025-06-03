@@ -73,14 +73,6 @@ public class CameraCommand extends BaseCommand {
                 regionIndex = plugin.getCameras().size() + 1;
             }
             if (remove) {
-                DbRow region;
-                try {
-                    region = DB.getFirstRow("SELECT `REGION` FROM `Cameras` WHERE `TRACKID` = '" + camPlayer.getEditing().getId() + "' AND `INDEX` = '" + regionIndex + "';");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                String regionDelete = region.getString("REGION");
-                CameraEditor.removeTrackRegions(regionDelete);
                 if (plugin.removeCamera(regionIndex, camPlayer.getEditing())) {
                     player.sendMessage(ChatColor.DARK_AQUA + "Camera " + regionIndex + " was removed from track " + camPlayer.getEditing().getDisplayName());
                 } else {
@@ -93,7 +85,6 @@ public class CameraCommand extends BaseCommand {
                 String minmaxRegion = minP + ":" + maxP;
                 if (s != null){
                     plugin.saveNewCamera(new Cam(player.getLocation(), camPlayer.getEditing(), regionIndex, minP, maxP, label));
-                    CameraEditor.setTrackRegions(minmaxRegion, camPlayer.getEditing());
                     player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
                 } else {
                     player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
