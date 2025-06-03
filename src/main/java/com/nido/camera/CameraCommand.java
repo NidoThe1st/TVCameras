@@ -148,9 +148,10 @@ public class CameraCommand extends BaseCommand {
 
     @CommandPermission("cameras.list")
     @Subcommand("list|l")
-    public static void onListCameras(Player p){
-        if (Utils.getClosestTrack(p) != null){
-            plugin.getTrackCameras(p);
+    public static void onListCameras(Player player){
+        CamPlayer camPlayer = plugin.getPlayer(player);
+        if (camPlayer.getEditing() != null){
+            plugin.getTrackCameras(player);
         }
     }
 
