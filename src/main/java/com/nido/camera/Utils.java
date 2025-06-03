@@ -58,7 +58,7 @@ public class Utils {
     }
     public static Vector stringToVector(String s) {
         String[] xyz = s.split(",");
-        return new Vector(Integer.parseInt(xyz[0]), Integer.parseInt(xyz[1]), Integer.parseInt(xyz[2]));
+        return new Vector(Double.parseDouble(xyz[0]), Double.parseDouble(xyz[1]), Double.parseDouble(xyz[2]));
     }
 
     //serialization of data

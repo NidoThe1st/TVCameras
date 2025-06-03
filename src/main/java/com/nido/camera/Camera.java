@@ -3,6 +3,7 @@ package com.nido.camera;
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.idb.*;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import lombok.Getter;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,8 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public final class Camera extends JavaPlugin {
+    static Camera plugin = Camera.getInstance();
     public FileConfiguration config = getConfig();
     HashMap<Player, CamPlayer> cameraPlayers = new HashMap<>();
+    //get all cameras
+    @Getter
     List<Cam> cameras = new ArrayList<>();
     //add a new camera with the name (addedcamera)
     public void addCamera(Cam camera){
@@ -39,30 +43,26 @@ public final class Camera extends JavaPlugin {
         return null;
     }
 
-    //get all cameras
-    public List<Cam> getCameras() {
-        return cameras;
-    }
-    public void getTrackCameras(Player p){
+    // FIX FIX FIX
+    public void getTrackCameras(Player player){
         List<Integer> trackcameras = new ArrayList<>();
         StringBuilder tracks = new StringBuilder("This track has cameras with index ");
+        CamPlayer camPlayer = plugin.getPlayer(player);
         for (Cam camera: cameras){
-            if (camera.getTrack() == Utils.getClosestTrack(p)) {
+            if (camera.getTrack() == camPlayer.getEditing()) {
                 Integer camIndex = camera.getIndex();
                 trackcameras.add(camIndex);
             }
-
-            for (int index: trackcameras) {
-                tracks.append(index).append(" ");
-            }
-            tracks.deleteCharAt(tracks.length() - 1);
         }
-        p.sendMessage(ChatColor.AQUA + tracks.toString());
+        for (int index : trackcameras) {
+            tracks.append(index).append(" ");
+        }
+        tracks.deleteCharAt(tracks.length() - 1);
+        player.sendMessage(ChatColor.AQUA + tracks.toString());
     }
-    private static Camera instance;
 
     public static Camera getInstance() {
-        return Camera.instance;
+        return plugin;
     }
 
     public void onQuit(Player player){
@@ -109,7 +109,7 @@ public final class Camera extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        Camera.instance = this;
+        plugin = this;
         config.options().copyDefaults(true);
         saveConfig();
         String username = config.getString("username");
