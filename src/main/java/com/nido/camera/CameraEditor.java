@@ -6,34 +6,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.*;
-
 public class CameraEditor {
-
-    private static HashMap<String, Track> trackRegions = new HashMap<>();
-
-    public static void setTrackRegions(String minmax, Track track){
-        trackRegions.put(minmax, track);
-    }
-
-    public static void removeTrackRegions(String minmax){
-        trackRegions.remove(minmax);
-        System.out.println(trackRegions);
-    }
-
-    public static Map<String, Track> getTrackRegions(){
-        return trackRegions;
-    }
-
-    public static Set<String> getKeysByValue(Map<String, Track> map, Track value){
-        Set<String> keys = new HashSet<>();
-        for (Map.Entry<String, Track> entry : map.entrySet()){
-            if (Objects.equals(entry.getValue(), value)){
-                keys.add(entry.getKey());
-            }
-        }
-        return keys;
-    }
 
     public void startParticleSpawner(Camera plugin){
         Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
