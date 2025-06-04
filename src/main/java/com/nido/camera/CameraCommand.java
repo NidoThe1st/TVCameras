@@ -51,7 +51,7 @@ public class CameraCommand extends BaseCommand {
     }
     @CommandPermission("cameras.set")
     @Subcommand("set|s")
-    @CommandCompletion("<index>, [label], [regionType]")
+    @CommandCompletion("[regionType], <index>, [label]")
     public static void onCameraSet(Player player, String regionType ,@Optional String index, @Optional String label) throws IncompleteRegionException {
         CamPlayer camPlayer = plugin.getPlayer(player);
         if(camPlayer.isEditing()) {
@@ -150,7 +150,7 @@ public class CameraCommand extends BaseCommand {
 
     @CommandPermission("cameras.mode")
     @Subcommand("mode")
-    public static void onMode(CamPlayer camPlayer){
+    public static void onMode(Player player){
 
     }
 }
