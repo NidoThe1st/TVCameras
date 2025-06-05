@@ -1,6 +1,9 @@
 package com.nido.camera;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.BukkitCommandCompletionContext;
+import co.aikar.commands.CommandCompletions;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -9,15 +12,35 @@ import me.makkuusen.timing.system.track.Track;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import java.awt.print.Paper;
+import java.util.Arrays;
 import java.util.Objects;
 
 
 @CommandAlias("camera|cam")
-public class CameraCommand extends BaseCommand {
+public class CameraCommands extends BaseCommand {
 
     static CameraPlugin plugin = CameraPlugin.getInstance();
+
+    public static void init(Plugin plugin){
+        var manager = new PaperCommandManager(plugin);
+        manager.enableUnstableAPI("brigadier");
+
+        initCompletions(manager.getCommandCompletions());
+        initCommands(manager);
+    }
+
+    static void initCompletions(CommandCompletions<BukkitCommandCompletionContext> completions){
+        registerEnumCompletion(completions, "regionType", Camera.RegionType.class);
+    }
+
+    static void initCommands(PaperCommandManager manager){
+        manager.registerCommand(new CameraCommands());
+    }
+
     static Utils utils = new Utils();
     @HelpCommand
     public static void onHelp(CommandSender sender) {
@@ -79,12 +102,8 @@ public class CameraCommand extends BaseCommand {
                 Region s = Objects.requireNonNull(plugin.getWorldEdit()).getSession(player).getSelection();
                 Vector maxP = Utils.stringToVector(s.getMaximumPoint().toParserString());
                 Vector minP = Utils.stringToVector(s.getMinimumPoint().toParserString());
-                if (s != null){
-                    plugin.saveNewCamera(new Camera(player.getLocation(), camPlayer.getEditing(), regionIndex, minP, maxP, label, regionType));
-                    player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
-                } else {
-                    player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Invalid or missing selection");
-                }
+                plugin.saveNewCamera(new Camera(player.getLocation(), camPlayer.getEditing(), regionIndex, minP, maxP, label, regionType));
+                player.sendMessage(ChatColor.AQUA + "Camera " + regionIndex + " was set to your position on track " + camPlayer.getEditing().getDisplayName());
             }
         } else {
             player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Enter edit mode first!");
@@ -103,33 +122,18 @@ public class CameraCommand extends BaseCommand {
         plugin.getPlayer(follower).stopFollowing();
         follower.sendMessage( ChatColor.DARK_AQUA + "You stopped following!");
     }
-    //checks if index should be removed (returns true if index starts with -)
-    private static boolean getParsedRemoveFlag(String index) {
-        return index.startsWith("-");
-    }
-    //gives an index that should be added/removed (removes +/-)
-    private static Integer getParsedIndex(String index) {
-        if (index.startsWith("-")) {
-            index = index.substring(1);
-        } else if (index.startsWith("+")) {
-            index = index.substring(1);
-        }
-        try {
-            return Integer.parseInt(index);
-        } catch (NumberFormatException exception) {
-            return null;
-        }
-    }
+
     @CommandPermission("cameras.view")
     @Subcommand("view|v")
     @CommandCompletion("<index>")
     public static void onViewCamera(Player player, int index){
         //checks if the index and the track actually exist
-        if(plugin.getCamera(Utils.getClosestTrack(player), index) != null) {
-            Camera camera = plugin.getCamera(Utils.getClosestTrack(player), index);
+        Track track = Utils.getClosestTrack(player);
+        if(plugin.getCamera(track, index) != null) {
+            Camera camera = plugin.getCamera(track, index);
             assert camera != null;
             camera.tpPlayer(player);
-            player.sendMessage(ChatColor.AQUA + "Teleported to camera number " + index + " on track " + Utils.getClosestTrack(player).getDisplayName());
+            player.sendMessage(ChatColor.AQUA + "Teleported to camera number " + index + " on track " + track.getDisplayName());
         }
     }
 
@@ -148,9 +152,40 @@ public class CameraCommand extends BaseCommand {
         Utils.openMenu(player);
     }
 
-    @CommandPermission("cameras.mode")
-    @Subcommand("mode")
-    public static void onMode(Player player){
-
+    @CommandPermission("cameras.info")
+    @Subcommand("info")
+    @CommandCompletion("<index>")
+    public static void onInfo(Player player, int index){
+        Track track = Utils.getClosestTrack(player);
+        Camera camera = plugin.getCamera(track, index);
+        player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Region type: " + camera.getRegionType());
     }
+
+    //checks if index should be removed (returns true if index starts with -)
+    private static boolean getParsedRemoveFlag(String index) {
+        return index.startsWith("-");
+    }
+    //gives an index that should be added/removed (removes +/-)
+    private static Integer getParsedIndex(String index) {
+        if (index.startsWith("-")) {
+            index = index.substring(1);
+        } else if (index.startsWith("+")) {
+            index = index.substring(1);
+        }
+        try {
+            return Integer.parseInt(index);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    static void registerEnumCompletion(CommandCompletions<?> completions, String name, Class<? extends Enum<?>> enumClass) {
+        completions.registerAsyncCompletion(name, ctx -> {
+            return Arrays.stream(enumClass.getEnumConstants())
+                    .map(Enum::name)
+                    .map(String::toLowerCase)
+                    .toList();
+        });
+    }
+
 }

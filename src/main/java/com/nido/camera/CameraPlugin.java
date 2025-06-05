@@ -128,13 +128,7 @@ public final class CameraPlugin extends JavaPlugin {
         Database db = new HikariPooledDatabase(options);
         DB.setGlobalDatabase(db);
         getServer().getPluginManager().registerEvents(new CameraListener(), this);
-
-
-
-        PaperCommandManager manager = new PaperCommandManager(this);
-        // enable brigadier integration for paper servers
-        manager.enableUnstableAPI("brigadier");
-        manager.registerCommand(new CameraCommand());
+        CameraCommands.init(plugin);
         //load data from db
         try {
             try {

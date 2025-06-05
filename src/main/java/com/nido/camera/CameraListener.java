@@ -31,7 +31,7 @@ public class CameraListener implements Listener {
                 for (Camera camera : plugin.getCameras()) {
                     if (camera.getTrack() == track) {
                         if (camera.isInsideRegion(p)) {
-                            if (camera.getRegionType() == "ONBOARD"){
+                            if (camera.getRegionType().equals("ONBOARD")){
                                 for (Player follower : camPlayer.getFollowers()){
                                     follower.setSpectatorTarget(p);
                                 }
@@ -122,14 +122,5 @@ public class CameraListener implements Listener {
                 camPlayer.setInv(false);
             }
         }
-    }
-
-    @EventHandler
-    public void onSpectate(PlayerStartSpectatingEntityEvent e){
-
-        Player p = e.getPlayer();
-        CamPlayer camPlayer = plugin.getPlayer(p);
-        camPlayer.stopFollowing();
-
     }
 }

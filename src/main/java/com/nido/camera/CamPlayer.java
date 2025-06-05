@@ -51,8 +51,8 @@ public class CamPlayer {
     public void addFollower(Player follower) {
         if(!followers.contains(follower)) {
             followers.add(follower);
-            CamPlayer camfollower = plugin.getPlayer(follower);
-            camfollower.startFollowing(p);
+            CamPlayer camFollower = plugin.getPlayer(follower);
+            camFollower.startFollowing(p);
         }
     }
     public void removeFollower(Player p) {
@@ -87,7 +87,7 @@ public class CamPlayer {
                 camera.tpPlayer(follower);
                 camPlayer.setCurrentCamera(camera);
                 follower.lookAt(p, LookAnchor.EYES, LookAnchor.EYES);
-                camPlayer.setCurrentCamera(camera);
+                //camPlayer.setCurrentCamera(camera);
             }
         }
     }

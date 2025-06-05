@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.nido.camera.CameraCommand.plugin;
+import static com.nido.camera.CameraCommands.plugin;
 
 public class Utils {
     public static Track getClosestTrack(Player p) {
