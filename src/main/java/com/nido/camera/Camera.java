@@ -58,9 +58,14 @@ public class Camera {
         }
     }
 
-    public boolean isInsideRegion(Player p) {
+    public boolean isInsideRegionLoc(Player p) {
         Vector pLoc = p.getLocation().toVector();
         return pLoc.isInAABB(minp, maxp);
+    }
+
+    public boolean isInsideRegionLoc(Location loc){
+        Vector vLoc = loc.toVector();
+        return vLoc.isInAABB(minp, maxp);
     }
 
     public Location getLocation() {return camlocation;}
@@ -71,7 +76,7 @@ public class Camera {
     public Vector getMax() {return maxp;}
 
     public enum RegionType{
-        STATIC, ONBOARD
+        STATIC, ONBOARD, PODIUM, GRID
     }
 
 }

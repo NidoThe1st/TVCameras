@@ -83,6 +83,12 @@ public class CamPlayer {
     public void setBestCam(Camera camera) {
         for (Player follower: followers) {
             CamPlayer camPlayer = plugin.getPlayer(follower);
+            if (follower.getSpectatorTarget() != null){
+                follower.setSpectatorTarget(null);
+                camera.tpPlayer(follower);
+                camPlayer.setCurrentCamera(camera);
+                follower.lookAt(p, LookAnchor.EYES, LookAnchor.EYES);
+            }
             if(camPlayer.getCurrentCamera() != camera) {
                 camera.tpPlayer(follower);
                 camPlayer.setCurrentCamera(camera);

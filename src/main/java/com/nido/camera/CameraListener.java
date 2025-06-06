@@ -1,10 +1,10 @@
 package com.nido.camera;
 
 import co.aikar.idb.DB;
-import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import me.makkuusen.timing.system.track.Track;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -32,12 +33,12 @@ public class CameraListener implements Listener {
             if(!camPlayer.getFollowers().isEmpty()) {
                 for (Camera camera : plugin.getCameras()) {
                     if (camera.getTrack() == track) {
-                        if (camera.isInsideRegion(p)) {
+                        if (camera.isInsideRegionLoc(p)) {
                             if (camera.getRegionType().equals("onboard")){
                                 for (Player follower : camPlayer.getFollowers()){
                                     follower.setSpectatorTarget(p);
                                 }
-                            } else {
+                            } else if (camera.getRegionType().equals("static")) {
                                 camPlayer.setBestCam(camera);
                             }
                         }
@@ -47,7 +48,7 @@ public class CameraListener implements Listener {
         } else if (camPlayer.isEditing()) {
             for (Camera camera : plugin.getCameras()){
                 if (camera.getTrack() == camPlayer.getEditing()){
-                    if (camera.isInsideRegion(p)){
+                    if (camera.isInsideRegionLoc(p)){
                         p.sendActionBar(Component.text("Index: " + camera.getIndex() + " | " + "Region Type: " + camera.getRegionType()).color(NamedTextColor.AQUA));
                     }
                 }
@@ -130,6 +131,30 @@ public class CameraListener implements Listener {
         if(e.getInventory().getType() == InventoryType.CHEST) {
             if (camPlayer.isInv()) {
                 camPlayer.setInv(false);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e){
+        Player p = e.getPlayer();
+        CamPlayer camPlayer = plugin.getPlayer(p);
+        //needs changing to a track from the event a player is in
+        Track track = Utils.getClosestTrack(p);
+        Location tpLoc = e.getTo();
+
+        if (!camPlayer.getFollowers().isEmpty()){
+            for (Camera camera : plugin.getCameras()){
+                if (camera.getTrack() == track){
+                    if (camera.isInsideRegionLoc(tpLoc)){
+                        //THIS DOESN'T EXECUTE
+                        if (e.getCause() == PlayerTeleportEvent.TeleportCause.PLUGIN){
+                            if (camera.getRegionType().equals("grid") || camera.getRegionType().equals("podium")){
+                                camPlayer.setBestCam(camera);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
