@@ -3,6 +3,8 @@ package com.nido.camera;
 import co.aikar.idb.DB;
 import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import me.makkuusen.timing.system.track.Track;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +41,14 @@ public class CameraListener implements Listener {
                                 camPlayer.setBestCam(camera);
                             }
                         }
+                    }
+                }
+            }
+        } else if (camPlayer.isEditing()) {
+            for (Camera camera : plugin.getCameras()){
+                if (camera.getTrack() == camPlayer.getEditing()){
+                    if (camera.isInsideRegion(p)){
+                        p.sendActionBar(Component.text("Index: " + camera.getIndex() + " | " + "Region Type: " + camera.getRegionType()).color(NamedTextColor.AQUA));
                     }
                 }
             }
