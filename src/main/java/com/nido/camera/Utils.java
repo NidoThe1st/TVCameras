@@ -1,7 +1,5 @@
 package com.nido.camera;
 
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import me.makkuusen.timing.system.api.TimingSystemAPI;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
@@ -10,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.nido.camera.CameraCommand.plugin;
+import static com.nido.camera.CameraCommands.plugin;
 
 public class Utils {
     public static Track getClosestTrack(Player p) {
@@ -93,11 +90,11 @@ public class Utils {
         CamPlayer camPlayer = plugin.getPlayer(player);
         AtomicInteger counter = new AtomicInteger(10);
         Inventory inv = Bukkit.createInventory(player,54, ChatColor.AQUA.toString() + ChatColor.BOLD + "Camera Menu");
-        HashMap<Integer, Cam> cameraitems = new HashMap<>();
+        HashMap<Integer, Camera> cameraitems = new HashMap<>();
         SkullBuilder cameraTemplate = new SkullBuilder(Material.PLAYER_HEAD, 1)
                 .setDisplayName("Camera")
                 .setOwner("e43a2867-f7f1-5dd2-9f3c-6eb405548153");
-        for (Cam camera: plugin.getCameras()) {
+        for (Camera camera: plugin.getCameras()) {
             if(camera.getTrack() != Utils.getClosestTrack(player)) {continue;}
             if(camera.getLabel() != null) {
                 cameraTemplate.setDisplayName(camera.getLabel());

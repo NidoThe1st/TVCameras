@@ -11,18 +11,18 @@ import java.util.*;
 public class CamPlayer {
     @Getter
     private Track editing;
-    private Camera plugin = Camera.getInstance();
+    private CameraPlugin plugin = CameraPlugin.getInstance();
     @Getter
     private Player p;
     private CamPlayer following;
     @Getter
     @Setter
-    private Cam currentCamera;
+    private Camera currentCamera;
     @Getter
     private List<Player> followers = new ArrayList<>();
     @Getter
     @Setter
-    private HashMap<Integer, Cam> cameraItems = new HashMap<>();
+    private HashMap<Integer, Camera> cameraItems = new HashMap<>();
     @Getter
     private boolean inv = false;
     @Getter
@@ -51,8 +51,8 @@ public class CamPlayer {
     public void addFollower(Player follower) {
         if(!followers.contains(follower)) {
             followers.add(follower);
-            CamPlayer camfollower = plugin.getPlayer(follower);
-            camfollower.startFollowing(p);
+            CamPlayer camFollower = plugin.getPlayer(follower);
+            camFollower.startFollowing(p);
         }
     }
     public void removeFollower(Player p) {
@@ -80,14 +80,14 @@ public class CamPlayer {
         CamPlayer.setEditors(this, false);
     }
 
-    public void setBestCam(Cam camera) {
+    public void setBestCam(Camera camera) {
         for (Player follower: followers) {
             CamPlayer camPlayer = plugin.getPlayer(follower);
             if(camPlayer.getCurrentCamera() != camera) {
                 camera.tpPlayer(follower);
                 camPlayer.setCurrentCamera(camera);
                 follower.lookAt(p, LookAnchor.EYES, LookAnchor.EYES);
-                camPlayer.setCurrentCamera(camera);
+                //camPlayer.setCurrentCamera(camera);
             }
         }
     }
