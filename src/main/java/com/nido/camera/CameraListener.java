@@ -31,7 +31,7 @@ public class CameraListener implements Listener {
                 for (Camera camera : plugin.getCameras()) {
                     if (camera.getTrack() == track) {
                         if (camera.isInsideRegion(p)) {
-                            if (camera.getRegionType().equals("ONBOARD")){
+                            if (camera.getRegionType().equals("onboard")){
                                 for (Player follower : camPlayer.getFollowers()){
                                     follower.setSpectatorTarget(p);
                                 }
