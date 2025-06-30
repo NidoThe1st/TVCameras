@@ -2,7 +2,7 @@ package com.nido.camera;
 
 import co.aikar.idb.DB;
 import me.makkuusen.timing.system.api.events.heat.HeatLoadEvent;
-import me.makkuusen.timing.system.heat.Heat;
+import me.makkuusen.timing.system.event.heat.Heat;
 import me.makkuusen.timing.system.track.Track;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

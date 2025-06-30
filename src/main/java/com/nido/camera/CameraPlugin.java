@@ -146,6 +146,16 @@ public final class CameraPlugin extends JavaPlugin {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            try {
+                DB.executeUpdate("""
+                    ALTER TABLE `Cameras`
+                    ADD COLUMN `REGIONTYPE` varchar(255) DEFAULT NULL;
+                """);
+            } catch (SQLException e) {
+                if (!e.getMessage().contains("Duplicate column name")) {
+                    e.printStackTrace();
+                }
+            }
             loadCameras();
         } catch (SQLException e) {
             throw new RuntimeException(e);

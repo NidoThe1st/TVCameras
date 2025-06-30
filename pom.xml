@@ -110,7 +110,7 @@
         <dependency>
             <groupId>me.makkuusen.timing.system</groupId>
             <artifactId>TimingSystem</artifactId>
-            <version>342</version>
+            <version>490</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
