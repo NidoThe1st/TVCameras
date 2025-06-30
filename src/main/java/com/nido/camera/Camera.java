@@ -71,7 +71,7 @@ public class Camera {
     public Vector getMax() {return maxp;}
 
     public enum RegionType{
-        STATIC, ONBOARD
+        STATIC, ONBOARD, GRID, PODIUM
     }
 
 }
