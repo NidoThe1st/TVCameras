@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.nido.camera.CameraCommands.plugin;
 
 public class Utils {
-    public static Track getClosestTrack(Player p) {
+    /*public static Track getClosestTrack(Player p) {
         List<Track> tracks = TimingSystemAPI.getTracks();
         Location playerLoc = p.getLocation();
         Track closest = null;
@@ -36,7 +36,7 @@ public class Utils {
             }
         }
         return closest;
-    }
+    }*/
     public static String locationToString(Location location) {
         if (location == null) {
             return null;
@@ -79,13 +79,14 @@ public class Utils {
         }
         return cameraids;
     }
+    /*
     public static Vector getMin(Location a, Location b) {
         return Vector.getMinimum(a.toVector(), b.toVector());
     }
     public static Vector getMax(Location a, Location b) {
         return Vector.getMaximum(a.toVector(), b.toVector());
     }
-
+    */
     public static void openMenu(Player player){
         CamPlayer camPlayer = plugin.getPlayer(player);
         AtomicInteger counter = new AtomicInteger(10);
@@ -95,7 +96,9 @@ public class Utils {
                 .setDisplayName("Camera")
                 .setOwner("e43a2867-f7f1-5dd2-9f3c-6eb405548153");
         for (Camera camera: plugin.getCameras()) {
-            if(camera.getTrack() != Utils.getClosestTrack(player)) {continue;}
+            if (camPlayer.isEditing()){
+                if(camera.getTrack() != camPlayer.getEditing()) {continue;}
+            }
             if(camera.getLabel() != null) {
                 cameraTemplate.setDisplayName(camera.getLabel());
             }else {

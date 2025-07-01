@@ -8,6 +8,7 @@ import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
+import me.makkuusen.timing.system.database.TrackDatabase;
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -15,8 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
-import java.awt.print.Paper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -35,6 +36,7 @@ public class CameraCommands extends BaseCommand {
 
     static void initCompletions(CommandCompletions<BukkitCommandCompletionContext> completions){
         registerEnumCompletion(completions, "regionType", Camera.RegionType.class);
+        completions.registerAsyncCompletion("camTrack", CameraCommands::camTrackCompletions);
     }
 
     static void initCommands(PaperCommandManager manager){
@@ -59,12 +61,12 @@ public class CameraCommands extends BaseCommand {
 
     @CommandPermission("cameras.edit")
     @Subcommand("edit|e")
-    public static void onEdit(Player player) {
+    @CommandCompletion("@camTrack")
+    public static void onEdit(Player player, Track track) {
         // Get player from the hashmap
         CamPlayer camPlayer = plugin.getPlayer(player);
         // If player already editing stop, if not start
         if(!camPlayer.isEditing()) {
-            Track track = Utils.getClosestTrack(player);
             camPlayer.startEditing(track);
             player.sendMessage(ChatColor.AQUA + "Started editing cameras at " + track.getDisplayName());
         } else {
@@ -127,13 +129,14 @@ public class CameraCommands extends BaseCommand {
     @Subcommand("view|v")
     @CommandCompletion("<index>")
     public static void onViewCamera(Player player, int index){
-        //checks if the index and the track actually exist
-        Track track = Utils.getClosestTrack(player);
-        if(plugin.getCamera(track, index) != null) {
-            Camera camera = plugin.getCamera(track, index);
-            assert camera != null;
-            camera.tpPlayer(player);
-            player.sendMessage(ChatColor.AQUA + "Teleported to camera number " + index + " on track " + track.getDisplayName());
+        CamPlayer camPlayer = plugin.getPlayer(player);
+        if (camPlayer.isEditing()){
+            if(plugin.getCamera(camPlayer.getEditing(), index) != null) {
+                Camera camera = plugin.getCamera(camPlayer.getEditing(), index);
+                assert camera != null;
+                camera.tpPlayer(player);
+                player.sendMessage(ChatColor.AQUA + "Teleported to camera number " + index + " on track " + camPlayer.getEditing().getDisplayName());
+            }
         }
     }
 
@@ -141,7 +144,7 @@ public class CameraCommands extends BaseCommand {
     @Subcommand("list|l")
     public static void onListCameras(Player player){
         CamPlayer camPlayer = plugin.getPlayer(player);
-        if (camPlayer.getEditing() != null){
+        if (camPlayer.isEditing()){
             plugin.getTrackCameras(player);
         }
     }
@@ -154,9 +157,8 @@ public class CameraCommands extends BaseCommand {
 
     @CommandPermission("cameras.info")
     @Subcommand("info")
-    @CommandCompletion("<index>")
-    public static void onInfo(Player player, int index){
-        Track track = Utils.getClosestTrack(player);
+    @CommandCompletion("@camTrack <index>")
+    public static void onInfo(Player player, Track track ,int index){
         Camera camera = plugin.getCamera(track, index);
         player.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "Region type: " + camera.getRegionType());
     }
@@ -186,6 +188,10 @@ public class CameraCommands extends BaseCommand {
                     .map(String::toLowerCase)
                     .toList();
         });
+    }
+
+    static List<String> camTrackCompletions(BukkitCommandCompletionContext ctx) {
+        return TrackDatabase.getTrackEditAsStrings(ctx.getPlayer());
     }
 
 }
