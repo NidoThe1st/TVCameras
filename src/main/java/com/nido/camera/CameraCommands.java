@@ -1,9 +1,6 @@
 package com.nido.camera;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.BukkitCommandCompletionContext;
-import co.aikar.commands.CommandCompletions;
-import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.*;
 import co.aikar.commands.annotation.*;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -31,6 +28,7 @@ public class CameraCommands extends BaseCommand {
         manager.enableUnstableAPI("brigadier");
 
         initCompletions(manager.getCommandCompletions());
+        initContexts(manager.getCommandContexts());
         initCommands(manager);
     }
 
@@ -41,6 +39,10 @@ public class CameraCommands extends BaseCommand {
 
     static void initCommands(PaperCommandManager manager){
         manager.registerCommand(new CameraCommands());
+    }
+
+    static void initContexts(CommandContexts<BukkitCommandExecutionContext> contexts){
+        contexts.registerContext(Track.class, CameraCommands::trackResolver);
     }
 
     static Utils utils = new Utils();
@@ -192,6 +194,12 @@ public class CameraCommands extends BaseCommand {
 
     static List<String> camTrackCompletions(BukkitCommandCompletionContext ctx) {
         return TrackDatabase.getTrackEditAsStrings(ctx.getPlayer());
+    }
+
+    static Track trackResolver(BukkitCommandExecutionContext ctx) {
+        String name = ctx.popFirstArg();
+        return TrackDatabase.getTrack(name)
+                .orElseThrow(() -> new InvalidCommandArgument("Unknown Track", false));
     }
 
 }
