@@ -2,6 +2,7 @@ package com.nido.camera;
 
 import me.makkuusen.timing.system.track.Track;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -19,6 +20,8 @@ public class CameraEditor {
                     if (camera.getTrack().getId() != track.getId()) {
                         continue;
                     }
+
+                    setParticles(player, camera.getLocation(), Particle.WAX_ON);
 
                     Vector min = camera.getMin();
                     Vector max = camera.getMax();
@@ -63,5 +66,9 @@ public class CameraEditor {
         for (int z = z1; z <= z2; z++) {
             player.spawnParticle(particle, x, y, z, 10);
         }
+    }
+
+    private void setParticles(Player player, Location location, Particle particle) {
+        player.spawnParticle(particle, location, 5);
     }
 }

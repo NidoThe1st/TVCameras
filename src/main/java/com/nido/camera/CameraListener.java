@@ -1,13 +1,15 @@
 package com.nido.camera;
 
 import co.aikar.idb.DB;
+import me.makkuusen.timing.system.api.TimingSystemAPI;
 import me.makkuusen.timing.system.api.events.heat.HeatLoadEvent;
+import me.makkuusen.timing.system.event.Participant;
 import me.makkuusen.timing.system.event.heat.Heat;
+import me.makkuusen.timing.system.tplayer.TPlayer;
 import me.makkuusen.timing.system.track.Track;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +18,6 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -28,21 +29,38 @@ public class CameraListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
+        TPlayer tPlayer = TimingSystemAPI.getTPlayer(p.getUniqueId());
         CamPlayer camPlayer = plugin.getPlayer(p);
-        Track track = Utils.getClosestTrack(p);
         //check if player is inside a boat
-        if(p.isInsideVehicle() && p.getVehicle() instanceof Boat) {
-            //check if player is followed
-
-            if(!camPlayer.getFollowers().isEmpty()) {
-                for (Camera camera : plugin.getCameras()) {
-                    if (camera.getTrack() == track) {
-                        if (camera.isInsideRegion(p)) {
-                            if (camera.getRegionType().equals("onboard")){
-                                for (Player follower : camPlayer.getFollowers()){
-                                    follower.setSpectatorTarget(p);
+        if (tPlayer.getParticipant().isPresent()){
+            Participant participant = tPlayer.getParticipant().get();
+            Track track = participant.getEvent().getTrack();
+            if(p.isInsideVehicle() && p.getVehicle() instanceof Boat) {
+                if(!camPlayer.getFollowers().isEmpty()) {
+                    for (Camera camera : plugin.getCameras()) {
+                        if (camera.getTrack() == track) {
+                            if (camera.isInsideRegion(p)) {
+                                if (camera.getRegionType().equals("onboard")){
+                                    for (Player follower : camPlayer.getFollowers()){
+                                        follower.setSpectatorTarget(p);
+                                    }
+                                } else if (camera.getRegionType().equals("static")) {
+                                    for (Player follower : camPlayer.getFollowers()){
+                                        if (follower.getSpectatorTarget() != null){
+                                            follower.setSpectatorTarget(null);
+                                        }
+                                    }
+                                    camPlayer.setBestCam(camera);
                                 }
-                            } else if (camera.getRegionType().equals("static")) {
+                            }
+                        }
+                    }
+                }
+            } else{
+                for (Camera camera : plugin.getCameras()){
+                    if (camera.getTrack() == track){
+                        if (camera.isInsideRegion(p)){
+                            if (camera.getRegionType().equals("podium")){
                                 camPlayer.setBestCam(camera);
                             }
                         }
@@ -57,29 +75,15 @@ public class CameraListener implements Listener {
                     }
                 }
             }
-        } else{
-            for (Camera camera : plugin.getCameras()){
-                if (camera.getTrack() == track){
-                    if (camera.isInsideRegion(p)){
-                        if (camera.getRegionType().equals("podium")){
-                            camPlayer.setBestCam(camera);
-                        }
-                    }
-                }
-            }
         }
     }
-
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-
         Player p = e.getPlayer();
         plugin.onQuit(p);
-
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-
         Player p = e.getPlayer();
         try {
             var playerRow = DB.getFirstRow("SELECT * FROM Camera_Players WHERE UUID = '" + p.getUniqueId() + "';");
@@ -87,9 +91,6 @@ public class CameraListener implements Listener {
                 plugin.addCamPlayer(p, playerRow);
             } else {plugin.newCamPlayer(p);}
         } catch (SQLException s) {s.printStackTrace();}
-
-
-
     }
     @EventHandler
     public void onLClick(InventoryClickEvent e){
@@ -110,7 +111,6 @@ public class CameraListener implements Listener {
     // --NEW--
     @EventHandler
     public void onRClick(InventoryClickEvent e){
-
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
         HashMap<Integer, Camera> cameraItems = camPlayer.getCameraItems();
@@ -154,11 +154,13 @@ public class CameraListener implements Listener {
         for (UUID uuid : heat.getDrivers().keySet()){
             Player p = Bukkit.getPlayer(uuid);
             CamPlayer camPlayer = plugin.getPlayer(p);
-            if (!camPlayer.getFollowers().isEmpty()){
-                for (Camera camera : plugin.getCameras()){
-                    if (camera.getTrack() == heat.getEvent().getTrack()){
-                        if (camera.getRegionType().equals("grid")){
-                            camPlayer.setBestCam(camera);
+            if (camPlayer != null){
+                if (!camPlayer.getFollowers().isEmpty()){
+                    for (Camera camera : plugin.getCameras()){
+                        if (camera.getTrack() == heat.getEvent().getTrack()){
+                            if (camera.getRegionType().equals("grid")){
+                                camPlayer.setBestCam(camera);
+                            }
                         }
                     }
                 }
