@@ -45,6 +45,11 @@ public class CameraListener implements Listener {
                                         follower.setSpectatorTarget(p);
                                     }
                                 } else if (camera.getRegionType().equals("static")) {
+                                    for (Player follower : camPlayer.getFollowers()){
+                                        if (follower.getSpectatorTarget() != null){
+                                            follower.setSpectatorTarget(null);
+                                        }
+                                    }
                                     camPlayer.setBestCam(camera);
                                 }
                             }
@@ -74,14 +79,11 @@ public class CameraListener implements Listener {
     }
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-
         Player p = e.getPlayer();
         plugin.onQuit(p);
-
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-
         Player p = e.getPlayer();
         try {
             var playerRow = DB.getFirstRow("SELECT * FROM Camera_Players WHERE UUID = '" + p.getUniqueId() + "';");
@@ -89,9 +91,6 @@ public class CameraListener implements Listener {
                 plugin.addCamPlayer(p, playerRow);
             } else {plugin.newCamPlayer(p);}
         } catch (SQLException s) {s.printStackTrace();}
-
-
-
     }
     @EventHandler
     public void onLClick(InventoryClickEvent e){
@@ -112,7 +111,6 @@ public class CameraListener implements Listener {
     // --NEW--
     @EventHandler
     public void onRClick(InventoryClickEvent e){
-
         Player p = (Player) e.getWhoClicked();
         CamPlayer camPlayer = plugin.getPlayer(p);
         HashMap<Integer, Camera> cameraItems = camPlayer.getCameraItems();
