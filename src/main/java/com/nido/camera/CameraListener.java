@@ -30,38 +30,23 @@ public class CameraListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        TPlayer tPlayer = TimingSystemAPI.getTPlayer(p.getUniqueId());
         CamPlayer camPlayer = plugin.getPlayer(p);
+        Track track = Utils.getClosestTrack(p);
         //check if player is inside a boat
-        if (tPlayer.getParticipant().isPresent()){
-            Participant participant = tPlayer.getParticipant().get();
-            Track track = participant.getEvent().getTrack();
-            if(p.isInsideVehicle() && p.getVehicle() instanceof Boat) {
-                if(!camPlayer.getFollowers().isEmpty()) {
-                    for (Camera camera : plugin.getCameras()) {
-                        if (camera.getTrack() == track) {
-                            if (camera.isInsideRegion(p)) {
-                                if (camera.getRegionType().equals("onboard")){
-                                    for (Player follower : camPlayer.getFollowers()){
-                                        follower.setSpectatorTarget(p);
-                                    }
-                                } else if (camera.getRegionType().equals("static")) {
-                                    for (Player follower : camPlayer.getFollowers()){
-                                        if (follower.getSpectatorTarget() != null){
+        if(p.isInsideVehicle() && p.getVehicle() instanceof Boat) {
+            if(!camPlayer.getFollowers().isEmpty()) {
+                for (Camera camera : plugin.getCameras()) {
+                    if (camera.getTrack() == track) {
+                        if (camera.isInsideRegion(p)) {
+                            if (camera.getRegionType().equals("onboard")){
+                                for (Player follower : camPlayer.getFollowers()){
+                                        follower.setSpectatorTarget(p);}
+                            } else if (camera.getRegionType().equals("static")) {
+                                for (Player follower : camPlayer.getFollowers()){
+                                    if (follower.getSpectatorTarget() != null){
                                             follower.setSpectatorTarget(null);
-                                        }
                                     }
-                                    camPlayer.setBestCam(camera);
                                 }
-                            }
-                        }
-                    }
-                }
-            } else{
-                for (Camera camera : plugin.getCameras()){
-                    if (camera.getTrack() == track){
-                        if (camera.isInsideRegion(p)){
-                            if (camera.getRegionType().equals("podium")){
                                 camPlayer.setBestCam(camera);
                             }
                         }
@@ -73,6 +58,16 @@ public class CameraListener implements Listener {
                 if (camera.getTrack() == camPlayer.getEditing()){
                     if (camera.isInsideRegion(p)){
                         p.sendActionBar(Component.text("Index: " + camera.getIndex() + " | " + "Region Type: " + camera.getRegionType()).color(NamedTextColor.AQUA));
+                    }
+                }
+            }
+        } else{
+            for (Camera camera : plugin.getCameras()){
+                if (camera.getTrack() == track){
+                    if (camera.isInsideRegion(p)){
+                        if (camera.getRegionType().equals("podium")){
+                            camPlayer.setBestCam(camera);
+                        }
                     }
                 }
             }
