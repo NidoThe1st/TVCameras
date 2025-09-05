@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class CameraListener implements Listener {
@@ -151,6 +152,7 @@ public class CameraListener implements Listener {
     @EventHandler
     public void onHeatLoad(HeatLoadEvent e){
         Heat heat = e.getHeat();
+
         for (UUID uuid : heat.getDrivers().keySet()){
             Player p = Bukkit.getPlayer(uuid);
             CamPlayer camPlayer = plugin.getPlayer(p);
@@ -158,8 +160,14 @@ public class CameraListener implements Listener {
                 if (!camPlayer.getFollowers().isEmpty()){
                     for (Camera camera : plugin.getCameras()){
                         if (camera.getTrack() == heat.getEvent().getTrack()){
-                            if (camera.getRegionType().equals("grid")){
-                                camPlayer.setBestCam(camera);
+                            if (Objects.equals(heat.getRound().getType().getDisplayName(), "Final") || Objects.equals(heat.getRound().getType().getDisplayName(), "Sprint")){
+                                if (camera.getRegionType().equals("racegrid")){
+                                    camPlayer.setBestCam(camera);
+                                }
+                            } else if (Objects.equals(heat.getRound().getType().getDisplayName(), "Qualy")) {
+                                if (camera.getRegionType().equals("qualigrid")){
+                                    camPlayer.setBestCam(camera);
+                                }
                             }
                         }
                     }
