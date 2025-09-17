@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.nido.camera.CameraCommands.plugin;
 
 public class Utils {
-    /*public static Track getClosestTrack(Player p) {
+    public static Track getClosestTrack(Player p) {
         List<Track> tracks = TimingSystemAPI.getTracks();
         Location playerLoc = p.getLocation();
         Track closest = null;
@@ -36,7 +36,7 @@ public class Utils {
             }
         }
         return closest;
-    }*/
+    }
     public static String locationToString(Location location) {
         if (location == null) {
             return null;
